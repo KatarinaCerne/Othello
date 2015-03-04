@@ -19,12 +19,12 @@ class Othello:
         menu = Menu(master)
         master.config(menu=menu)
 
-##        meni = Menu(menu)
-##        menu.add_cascade(label="Igra", menu=meni)
-##        igra_menu.add_command(label="Črni=Človek, Beli=Človek", command=lambda: self.igra("človek", "človek"))
-##        igra_menu.add_command(label="Črni=Človek, Beli=Računalnik", command=lambda: self.igra("človek", "računalnik"))
-##        igra_menu.add_command(label="Črni=Računalnik, Beli=Človek", command=lambda: self.igra("računalnik", "človek"))
-##        igra_menu.add_command(label="Črni=Računalnik, Beli=Računalnik", command=lambda: self.igra("računalnik", "računalnik"))
+        meni = Menu(menu)
+        menu.add_cascade(label="Igra", menu=meni)
+        meni.add_command(label="Črni=Človek, Beli=Človek", command=lambda: self.igra("človek", "človek"))
+        meni.add_command(label="Črni=Človek, Beli=Računalnik", command=lambda: self.igra("človek", "računalnik"))
+        meni.add_command(label="Črni=Računalnik, Beli=Človek", command=lambda: self.igra("računalnik", "človek"))
+        meni.add_command(label="Črni=Računalnik, Beli=Računalnik", command=lambda: self.igra("računalnik", "računalnik"))
 
 ##        menu.add_command(label="Izhod", command=self.zapri)
 
@@ -36,7 +36,7 @@ class Othello:
         self.napis = StringVar(master, value="Začnimo.")
         Label(master, textvariable=self.napis).grid(row=0, column=0)
 
-        self.canvas = Canvas(master, width=800, height=800)
+        self.canvas = Canvas(master, width=400, height=400)
         self.canvas.grid(row=1, column=0, columnspan=2)
         self.canvas.bind('<Button-1>', self.klik)
 
@@ -52,20 +52,25 @@ class Othello:
         self.napis.set("Na potezi je črni.")
         
         self.canvas.delete(ALL)
-        self.canvas.create_line(100,0,100,800)
-        self.canvas.create_line(200,0,200,800)
-        self.canvas.create_line(300,0,300,800)
-        self.canvas.create_line(400,0,400,800)
-        self.canvas.create_line(500,0,500,800)
-        self.canvas.create_line(600,0,600,800)
-        self.canvas.create_line(700,0,700,800)
-        self.canvas.create_line(0,100,800,100)
-        self.canvas.create_line(0,200,800,200)
-        self.canvas.create_line(0,300,800,300)
-        self.canvas.create_line(0,400,800,400)
-        self.canvas.create_line(0,500,800,500)
-        self.canvas.create_line(0,600,800,600)
-        self.canvas.create_line(0,700,800,700)
+        self.canvas.create_line(50,0,50,400)
+        self.canvas.create_line(100,0,100,400)
+        self.canvas.create_line(150,0,150,400)
+        self.canvas.create_line(200,0,200,400)
+        self.canvas.create_line(250,0,250,400)
+        self.canvas.create_line(300,0,300,400)
+        self.canvas.create_line(350,0,350,400)
+        self.canvas.create_line(0,50,400,50)
+        self.canvas.create_line(0,100,400,100)
+        self.canvas.create_line(0,150,400,150)
+        self.canvas.create_line(0,200,400,200)
+        self.canvas.create_line(0,250,400,250)
+        self.canvas.create_line(0,300,400,300)
+        self.canvas.create_line(0,350,400,350)
+
+        self.canvas.create_oval(150+5, 150+5, 150+45, 150+45, fill="black")
+        self.canvas.create_oval(200+5, 200+5, 200+45, 200+45, fill="black")
+        self.canvas.create_oval(200+5, 150+5, 200+45, 150+45)
+        self.canvas.create_oval(150+5, 200+5, 150+45, 200+45)
 
     def odigraj(self, i, j):
         if self.polje[i][j] is None:
@@ -81,19 +86,19 @@ class Othello:
     def klik(self, event):
         if ((self.na_potezi == "Črni" and self.crni == "človek") or
             (self.na_potezi == "Beli" and self.beli == "človek")):
-            i = int(event.x / 100)
-            j = int(event.y / 100)
+            i = int(event.x / 50)
+            j = int(event.y / 50)
             self.odigraj(i, j)
                 
     def narisiCrnega(self, i, j):
-        x = i * 100
-        y = j * 100
-        self.canvas.create_oval(x+5, y+5, x+95, y+95, fill="black")
+        x = i * 50
+        y = j * 50
+        self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="black")
 
     def narisiBelega(self, i, j):
-        x = i * 100
-        y = j * 100
-        self.canvas.create_oval(x+5, y+5, x+95, y+95)
+        x = i * 50
+        y = j * 50
+        self.canvas.create_oval(x+5, y+5, x+45, y+45)
 
 ##    for otrok in okvir.winfo_children():
 ##        otrok.grid_configure(padx=4, pady=2)
