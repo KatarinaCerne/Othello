@@ -101,8 +101,11 @@ class Othello:
         self.stejcrne = 0
         self.stejbele = 0
 
+<<<<<<< HEAD
         self.veljavna = None
 
+=======
+>>>>>>> 8a22ca0ef553ebda2f75963aa5b259685cdc6e5b
     def zapri(self):
         self.canvas.master.destroy()
 
@@ -151,7 +154,11 @@ class Othello:
             self.na_potezi = drugi(self.na_potezi)
             self.napis.set("Na potezi je " + self.na_potezi)
             self.preobrni(i,j)
+<<<<<<< HEAD
             #print(self.zetoni)
+=======
+            print(self.zetoni)
+>>>>>>> 8a22ca0ef553ebda2f75963aa5b259685cdc6e5b
 
 
     def klik(self, event):
@@ -177,6 +184,7 @@ class Othello:
         self.stejbele+=1
         self.zetoni[i][j] = self.canvas.create_oval(x+5, y+5, x+45, y+45)
 
+<<<<<<< HEAD
 
     def preobrni(self, i, j):
         barva = self.na_potezi
@@ -197,6 +205,18 @@ class Othello:
                     else:
                         self.canvas.itemconfig(self.zetoni[i+di][j+dj], fill="black")
                     k += 1
+=======
+    def preobrni(self, i, j, di, dj):
+        barva=self.na_potezi
+        i=1
+        while self.polje[i+di][j+dj] == drugi(self.na_potezi):
+            self.polje[i+di][j+dj] == barva
+            if barva == "Beli":
+                self.canvas.itemconfig(self.zetoni[i+1][j], fill="white")
+            else:
+                self.canvas.itemconfig(self.zetoni[i+1][j], fill="black")
+            i += 1
+>>>>>>> 8a22ca0ef553ebda2f75963aa5b259685cdc6e5b
 
     
 
