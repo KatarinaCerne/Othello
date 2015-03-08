@@ -7,7 +7,6 @@ def drugi(igr):
     else:
         return "Črni"
 
-
 def veljavna(barva, di, dj, polje, i, j):
     k=1
     while polje[i+k*di][j+k*dj] == drugi(barva):
@@ -76,9 +75,14 @@ class Othello:
         self.napis = StringVar(master, value="Začnimo.")
         Label(master, textvariable=self.napis).grid(row=0, column=0)
 
-##        self.napiscrni = StringVar(master, value=")
-##        self.napisbeli = StringVar(master, value=
-##        Label(master, textvariable=
+        #število crnih in belih ploščic, ki so že na polju
+        self.stejcrne = 2
+        self.stejbele = 2
+
+        self.napiscrni = StringVar(master, value="")
+        self.napisbeli = StringVar(master, value="")
+        Label(master, textvariable=self.napiscrni).grid(row=3, column=0)
+        Label(master, textvariable=self.napisbeli).grid(row=3, column=1)
 
         self.canvas = Canvas(master, width=400, height=400)
         self.canvas.grid(row=2, column=0, columnspan=2)
@@ -89,11 +93,7 @@ class Othello:
 
         self.igra('človek', 'človek')
 
-        #število crnih in belih polj, ki so že na plošci
-        self.stejcrne = 0
-        self.stejbele = 0
 
-        self.veljavna = None
 
     def zapri(self):
         self.canvas.master.destroy()
@@ -106,6 +106,9 @@ class Othello:
         self.na_potezi = "Črni"
         #kdo je na potezi
         self.napis.set("Na potezi je črni.")
+
+        self.napiscrni.set("Črni: "+str(self.stejcrne))
+        self.napisbeli.set("Beli: "+str(self.stejbele))
         
         self.canvas.delete(ALL)
         self.canvas.create_line(50,0,50,400)
@@ -150,6 +153,8 @@ class Othello:
             print(seznam_veljavnosti)
             self.na_potezi = drugi(self.na_potezi)
             self.napis.set("Na potezi je " + self.na_potezi)
+            self.napiscrni.set("Črni: "+str(self.stejcrne))
+            self.napisbeli.set("Beli: "+str(self.stejbele))
 
 
     def klik(self, event):
@@ -192,8 +197,12 @@ class Othello:
                         self.polje[i+k*di][j+k*dj] = barva
                         if barva == "Beli":
                             self.canvas.itemconfig(self.zetoni[i+k*di][j+k*dj], fill="white")
+                            self.stejcrne-=1
+                            self.stejbele+=1
                         else:
                             self.canvas.itemconfig(self.zetoni[i+k*di][j+k*dj], fill="black")
+                            self.stejcrne+=1
+                            self.stejbele-=1
                         k += 1
                 else:
                     pass
