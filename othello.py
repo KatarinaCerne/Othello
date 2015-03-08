@@ -7,22 +7,19 @@ def drugi(igr):
     else:
         return "Črni"
 
+
 def veljavna(barva, di, dj, polje, i, j):
     k=1
     while polje[i+k*di][j+k*dj] == drugi(barva):
-        print("sprememba",k*di, k*dj)
-        print("nove", i+k*di, j+k*dj)
         if (i+k*di,di) == (7,1) or (i+k*di,di) == (0,-1) or (j+k*dj,dj) == (7,1) or (j+k*dj,dj) == (0,-1):
             return False
         k+=1
-    #print("k",k)
-    print("končne", i+k*di, j+k*dj)
     if polje[i+k*di][j+k*dj] == barva:
         return True
     else:
         return False
 
-def seznam_sosedov(p, i, j):
+def seznam_sosedov(i, j):
     """Vrne seznam sosedov polja s koordinatami (i,j)"""
     if i == 0:
         if j == 0:
@@ -140,13 +137,17 @@ class Othello:
         self.polje[4][3] = "Beli"
 
     def odigraj(self, i, j):
-        if self.polje[i][j] is None:
+        seznam_veljavnosti=[veljavna(self.na_potezi,el[0]-i,el[1]-j,self.polje,i,j) for el in seznam_sosedov(i,j)
+                            if self.na_potezi != self.polje[el[0]][el[1]] and self.polje[el[0]][el[1]] != None]
+        
+        if self.polje[i][j] is None and True in seznam_veljavnosti:
             self.polje[i][j] = self.na_potezi
             if self.na_potezi == "Črni":
                 self.narisiCrnega(i,j)
             else:
                 self.narisiBelega(i,j)
             self.preobrni(i,j)
+            print(seznam_veljavnosti)
             self.na_potezi = drugi(self.na_potezi)
             self.napis.set("Na potezi je " + self.na_potezi)
 
@@ -157,9 +158,7 @@ class Othello:
             (self.na_potezi == "Beli" and self.beli == "človek")):
             i = int(event.x / 50)
             j = int(event.y / 50)
-            print("koordinata",i,j)
             self.odigraj(i, j)
-            print("___")
                 
     def narisiCrnega(self, i, j):
         x = i * 50
@@ -178,7 +177,7 @@ class Othello:
 
     def preobrni(self, i, j):
         barva = self.na_potezi
-        seznam = seznam_sosedov(self.polje, i, j)
+        seznam = seznam_sosedov(i, j)
         for el in seznam:
             i1 = el[0]
             j1 = el[1]
@@ -187,13 +186,9 @@ class Othello:
             else:
                 di = i1-i
                 dj = j1-j
-                #print(di,dj)
                 k=1
-                print(veljavna(barva, di, dj, self.polje, i, j))
-                print("*")
                 if veljavna(barva, di, dj, self.polje, i, j):
                     while self.polje[i+k*di][j+k*dj] == drugi(barva):
-                        #print("sprememba",k*di, k*dj, "+")
                         self.polje[i+k*di][j+k*dj] = barva
                         if barva == "Beli":
                             self.canvas.itemconfig(self.zetoni[i+k*di][j+k*dj], fill="white")
