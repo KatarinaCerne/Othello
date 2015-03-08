@@ -8,6 +8,7 @@ def drugi(igr):
         return "Črni"
 
 def veljavna(barva, di, dj, polje, i, j):
+    """Če je poteza veljavna, vrne True, sicer vrne False"""
     k=1
     while polje[i+k*di][j+k*dj] == drugi(barva):
         if (i+k*di,di) == (7,1) or (i+k*di,di) == (0,-1) or (j+k*dj,dj) == (7,1) or (j+k*dj,dj) == (0,-1):
@@ -51,8 +52,7 @@ class Othello:
 ##        okvir.configure(background="#F2F7BB")
 ##        okvir.grid(column=0, row=0)
 
-
-########meni############
+        #meni#
         menu = Menu(master)
         master.config(menu=menu)
 
@@ -64,36 +64,35 @@ class Othello:
         meni.add_command(label="Črni=Računalnik, Beli=Računalnik", command=lambda: self.igra("računalnik", "računalnik"))
 
         menu.add_command(label="Izhod", command=self.zapri)
-
-#####################################
-
+        ######
+        
         self.na_potezi = None
 
         self.crni = 'človek'
         self.beli = 'človek'
 
         self.napis = StringVar(master, value="Začnimo.")
-        Label(master, textvariable=self.napis).grid(row=0, column=0)
+        Label(master, textvariable=self.napis,font=("Tahoma", 14)).grid(row=0, column=0,sticky=W)
 
-        #število crnih in belih ploščic, ki so že na polju
+        #število crnih in belih ploščic, ki so na polju
         self.stejcrne = 2
         self.stejbele = 2
 
         self.napiscrni = StringVar(master, value="")
         self.napisbeli = StringVar(master, value="")
-        Label(master, textvariable=self.napiscrni).grid(row=3, column=0)
-        Label(master, textvariable=self.napisbeli).grid(row=3, column=1)
+        Label(master, textvariable=self.napiscrni,font=("Tahoma", 14)).grid(row=3, column=0,sticky=W)
+        Label(master, textvariable=self.napisbeli,font=("Tahoma", 14)).grid(row=3, column=1,sticky=E)
 
-        self.canvas = Canvas(master, width=400, height=400)
+        self.canvas = Canvas(master, width=400, height=400, background="#97CAB1")
         self.canvas.grid(row=2, column=0, columnspan=2)
         self.canvas.bind('<Button-1>', self.klik)
 
+        #seznam, ki vsebuje elemente "None"(prazno polje), "Črni" in "Beli"
         self.polje = [[None for i in range(8)] for j in range(8)]
+        #seznam, ki vsebuje krogce(žetone)
         self.zetoni = [[None for i in range(8)] for j in range(8)]
 
         self.igra('človek', 'človek')
-
-
 
     def zapri(self):
         self.canvas.master.destroy()
@@ -103,10 +102,11 @@ class Othello:
         self.crni = crni
         self.beli = beli
 
+        #nastavi, da začne črni
         self.na_potezi = "Črni"
-        #kdo je na potezi
         self.napis.set("Na potezi je črni.")
 
+        #nastavi napise za število črnih/belih žetonov
         self.napiscrni.set("Črni: "+str(self.stejcrne))
         self.napisbeli.set("Beli: "+str(self.stejbele))
         
@@ -140,6 +140,7 @@ class Othello:
         self.polje[4][3] = "Beli"
 
     def odigraj(self, i, j):
+        #če je polje prazno in poteza veljavna, se poteza odigra
         seznam_veljavnosti=[veljavna(self.na_potezi,el[0]-i,el[1]-j,self.polje,i,j) for el in seznam_sosedov(i,j)
                             if self.na_potezi != self.polje[el[0]][el[1]] and self.polje[el[0]][el[1]] != None]
         
@@ -150,7 +151,6 @@ class Othello:
             else:
                 self.narisiBelega(i,j)
             self.preobrni(i,j)
-            print(seznam_veljavnosti)
             self.na_potezi = drugi(self.na_potezi)
             self.napis.set("Na potezi je " + self.na_potezi)
             self.napiscrni.set("Črni: "+str(self.stejcrne))
@@ -158,7 +158,7 @@ class Othello:
 
 
     def klik(self, event):
-        #ko klikneš se nekaj zgodi
+        #ko klikneš, se odigra poteza
         if ((self.na_potezi == "Črni" and self.crni == "človek") or
             (self.na_potezi == "Beli" and self.beli == "človek")):
             i = int(event.x / 50)
@@ -166,6 +166,7 @@ class Othello:
             self.odigraj(i, j)
                 
     def narisiCrnega(self, i, j):
+        #doda črn žeton
         x = i * 50
         y = j * 50
         self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="black")
@@ -173,6 +174,7 @@ class Othello:
         self.zetoni[i][j] = self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="black")
 
     def narisiBelega(self, i, j):
+        #doda bel žeton
         x = i * 50
         y = j * 50
         self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="white")
@@ -181,6 +183,7 @@ class Othello:
 
 
     def preobrni(self, i, j):
+        #spremeni barve žetonov
         barva = self.na_potezi
         seznam = seznam_sosedov(i, j)
         for el in seznam:
