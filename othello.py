@@ -7,49 +7,44 @@ def drugi(igr):
     else:
         return "Črni"
 
-def veljavna(barva, slovar, i, j):
-    for el in slovar:
-        if el == barva or el == None:
-            pass
-        else:
-            i2 = slovar[el][0]
-            j2 = slovar[el][1]
-            di = i2-i
-            dj = j2-j
-            k=1
-            while self.polje[i+k*di][j+k*dj] == drugi(barva):
-                if i+k*di == 7 or i+k*di == 0 or j+k*dj == 7 or j+k*dj == 0:
-                    return False
-                else:
-                    k+=1
-            if self.polje[i+k*d][j+k*d] == barva:
-                return True
-            else:
-                return False
+def veljavna(barva, di, dj, polje, i, j):
+    k=1
+    while polje[i+k*di][j+k*dj] == drugi(barva):
+        print("sprememba",k*di, k*dj)
+        print("nove", i+k*di, j+k*dj)
+        if (i+k*di,di) == (7,1) or (i+k*di,di) == (0,-1) or (j+k*dj,dj) == (7,1) or (j+k*dj,dj) == (0,-1):
+            return False
+        k+=1
+    #print("k",k)
+    print("končne", i+k*di, j+k*dj)
+    if polje[i+k*di][j+k*dj] == barva:
+        return True
+    else:
+        return False
 
-def slovar_sosedov(p, i, j):
+def seznam_sosedov(p, i, j):
     """Vrne seznam sosedov polja s koordinatami (i,j)"""
     if i == 0:
         if j == 0:
-            return {p[i+1][j]:[i+1,j], p[i+1][j+1]:[i+1,j+1], p[i][j+1]:[i,j+1]}
+            return [[i+1,j],[i+1,j+1],[i,j+1]]
         elif j == 7:
-            return {p[i+1][j]:[i+1,j], p[i+1][j-1]:[i+1,j-1], p[i][j-1]:[i,j-1]}
+            return [[i+1,j],[i+1,j-1],[i,j-1]]
         else:
-            return {p[i][j-1]:[i,j-1], p[i+1][j-1]:[i+1,j-1], p[i+1][j]:[i+1,j], p[i+1][j+1]:[i+1,j+1], p[i][j+1]:[i,j+1]}
+            return [[i,j-1],[i+1,j-1],[i+1,j],[i+1,j+1],[i,j+1]]
     elif i == 7:
         if j == 0:
-            return {p[i-1][j]:[i-1,j], p[i-1][j+1]:[i-1,j+1], p[i][j+1]:[i,j+1]}
+            return [[i-1,j],[i-1,j+1],[i,j+1]]
         elif j == 7:
-            return {p[i-1][j]:[i-1,j], p[i-1][j-1]:[i-1,j-1], p[i][j-1]:[i,j-1]}
+            return [[i-1,j],[i-1,j-1],[i,j-1]]
         else:
-            return {p[i][j-1]:[i,j-1], p[i-1][j-1]:[i-1,j-1], p[i-1][j]:[i-1,j], p[i-1][j+1]:[i-1,j+1], p[i][j+1]:[i,j+1]}
+            return [[i,j-1],[i-1,j-1],[i-1,j],[i-1,j+1],[i,j+1]]
     else:
         if j == 0:
-            return {p[i-1][j]:[i-1,j], p[i-1][j+1]:[i-1,j+1], p[i][j+1]:[i,j+1], p[i+1][j+1]:[i+1,j+1], p[i+1][j]:[i+1,j]}
+            return [[i-1,j],[i-1,j+1],[i,j+1],[i+1,j+1],[i+1,j]]
         elif j == 7:
-            return {p[i-1][j]:[i-1,j], p[i-1][j-1]:[i-1,j-1], p[i][j-1]:[i,j-1], p[i+1][j-1]:[i-1,j+1], p[i+1][j]:[i+1,j]}
+            return [[i-1,j],[i-1,j-1],[i,j-1],[i+1,j-1],[i+1,j]]
         else:
-            return {p[i-1][j]:[i-1][j], p[i+1][j]:[i+1][j], p[i-1][j+1]:[i-1,j+1], p[i][j+1]:[i,j+1], p[i+1][j+1]:[i+1,j+1], p[i-1][j-1]:[i-1,j-1], p[i][j-1]:[i,j-1], p[i+1][j-1]:[i+1,j-1]}
+            return [[i-1, j],[i+1, j],[i-1,j+1],[i,j+1],[i+1,j+1],[i-1,j-1],[i,j-1],[i+1,j-1]]
 
 class Othello:
     def __init__(self, master):
@@ -101,11 +96,8 @@ class Othello:
         self.stejcrne = 0
         self.stejbele = 0
 
-<<<<<<< HEAD
         self.veljavna = None
 
-=======
->>>>>>> 8a22ca0ef553ebda2f75963aa5b259685cdc6e5b
     def zapri(self):
         self.canvas.master.destroy()
 
@@ -136,13 +128,16 @@ class Othello:
 
         self.canvas.create_oval(150+5, 150+5, 150+45, 150+45, fill="black")
         self.canvas.create_oval(200+5, 200+5, 200+45, 200+45, fill="black")
-        self.canvas.create_oval(200+5, 150+5, 200+45, 150+45)
-        self.canvas.create_oval(150+5, 200+5, 150+45, 200+45)
+        self.canvas.create_oval(200+5, 150+5, 200+45, 150+45, fill="white")
+        self.canvas.create_oval(150+5, 200+5, 150+45, 200+45, fill="white")
         self.zetoni[3][3]=self.canvas.create_oval(150+5, 150+5, 150+45, 150+45, fill="black")
-        self.zetoni[4][4]=self.canvas.create_oval(150+5, 150+5, 150+45, 150+45, fill="black")
-        self.zetoni[4][3]=self.canvas.create_oval(150+5, 150+5, 150+45, 150+45)
-        self.zetoni[3][4]=self.canvas.create_oval(150+5, 150+5, 150+45, 150+45)
-        print(self.zetoni)
+        self.zetoni[4][4]=self.canvas.create_oval(200+5, 200+5, 200+45, 200+45, fill="black")
+        self.zetoni[4][3]=self.canvas.create_oval(200+5, 150+5, 200+45, 150+45, fill="white")
+        self.zetoni[3][4]=self.canvas.create_oval(150+5, 200+5, 150+45, 200+45, fill="white")
+        self.polje[3][3] = "Črni"
+        self.polje[4][4] = "Črni"
+        self.polje[3][4] = "Beli"
+        self.polje[4][3] = "Beli"
 
     def odigraj(self, i, j):
         if self.polje[i][j] is None:
@@ -151,14 +146,9 @@ class Othello:
                 self.narisiCrnega(i,j)
             else:
                 self.narisiBelega(i,j)
+            self.preobrni(i,j)
             self.na_potezi = drugi(self.na_potezi)
             self.napis.set("Na potezi je " + self.na_potezi)
-            self.preobrni(i,j)
-<<<<<<< HEAD
-            #print(self.zetoni)
-=======
-            print(self.zetoni)
->>>>>>> 8a22ca0ef553ebda2f75963aa5b259685cdc6e5b
 
 
     def klik(self, event):
@@ -167,8 +157,9 @@ class Othello:
             (self.na_potezi == "Beli" and self.beli == "človek")):
             i = int(event.x / 50)
             j = int(event.y / 50)
-            print(i,j)
+            print("koordinata",i,j)
             self.odigraj(i, j)
+            print("___")
                 
     def narisiCrnega(self, i, j):
         x = i * 50
@@ -180,47 +171,38 @@ class Othello:
     def narisiBelega(self, i, j):
         x = i * 50
         y = j * 50
-        self.canvas.create_oval(x+5, y+5, x+45, y+45)
+        self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="white")
         self.stejbele+=1
-        self.zetoni[i][j] = self.canvas.create_oval(x+5, y+5, x+45, y+45)
+        self.zetoni[i][j] = self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="white")
 
-<<<<<<< HEAD
 
     def preobrni(self, i, j):
         barva = self.na_potezi
-        slovar = slovar_sosedov(self.polje, i, j)
-        for el in slovar:
-            if barva == el or el == None:
+        seznam = seznam_sosedov(self.polje, i, j)
+        for el in seznam:
+            i1 = el[0]
+            j1 = el[1]
+            if barva == self.polje[i1][j1] or self.polje[i1][j1] == None:
                 pass
             else:
-                i2 = slovar[el][0]
-                j2 = slovar[el][1]
-                di = i2-i
-                dj = j2-j
+                di = i1-i
+                dj = j1-j
+                #print(di,dj)
                 k=1
-                while self.polje[i+k*di][j+k*dj] == drugi(barva):
-                    self.polje[i+di][j+dj] == barva
-                    if barva == "Beli":
-                        self.canvas.itemconfig(self.zetoni[i+di][j+dj], fill="white")
-                    else:
-                        self.canvas.itemconfig(self.zetoni[i+di][j+dj], fill="black")
-                    k += 1
-=======
-    def preobrni(self, i, j, di, dj):
-        barva=self.na_potezi
-        i=1
-        while self.polje[i+di][j+dj] == drugi(self.na_potezi):
-            self.polje[i+di][j+dj] == barva
-            if barva == "Beli":
-                self.canvas.itemconfig(self.zetoni[i+1][j], fill="white")
-            else:
-                self.canvas.itemconfig(self.zetoni[i+1][j], fill="black")
-            i += 1
->>>>>>> 8a22ca0ef553ebda2f75963aa5b259685cdc6e5b
-
-    
-
-    
+                print(veljavna(barva, di, dj, self.polje, i, j))
+                print("*")
+                if veljavna(barva, di, dj, self.polje, i, j):
+                    while self.polje[i+k*di][j+k*dj] == drugi(barva):
+                        #print("sprememba",k*di, k*dj, "+")
+                        self.polje[i+k*di][j+k*dj] = barva
+                        if barva == "Beli":
+                            self.canvas.itemconfig(self.zetoni[i+k*di][j+k*dj], fill="white")
+                        else:
+                            self.canvas.itemconfig(self.zetoni[i+k*di][j+k*dj], fill="black")
+                        k += 1
+                else:
+                    pass
+                    
 
 ##    for otrok in okvir.winfo_children():
 ##        otrok.grid_configure(padx=4, pady=2)
