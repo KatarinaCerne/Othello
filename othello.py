@@ -19,7 +19,7 @@ def veljavna(barva, di, dj, polje, i, j):
     else:
         return False
 
-def seznam_sosedov(i, j):
+def seznam_sosedov(i, j) :
     """Vrne seznam sosedov polja s koordinatami (i,j)"""
     if i == 0:
         if j == 0:
@@ -42,6 +42,23 @@ def seznam_sosedov(i, j):
             return [[i-1,j],[i-1,j-1],[i,j-1],[i+1,j-1],[i+1,j]]
         else:
             return [[i-1, j],[i+1, j],[i-1,j+1],[i,j+1],[i+1,j+1],[i-1,j-1],[i,j-1],[i+1,j-1]]
+
+def ni_poteze(barva, polje):
+    for i,st in enumerate(polje):
+            for j,vr in enumerate(st):
+                if vr != None:
+                    pass
+                else:
+                    for el in seznam_sosedov(i, j):
+                        i1 = el[0]
+                        j1 = el[1]
+                        di = i1-i
+                        dj = j1-j
+                        if veljavna(barva, di, dj, polje, i, j):
+                            return False
+                        else:
+                            pass
+    return True
 
 class Othello:
     def __init__(self, master):
@@ -156,7 +173,6 @@ class Othello:
             self.napiscrni.set("Črni: "+str(self.stejcrne))
             self.napisbeli.set("Beli: "+str(self.stejbele))
 
-
     def klik(self, event):
         #ko klikneš, se odigra poteza
         if ((self.na_potezi == "Črni" and self.crni == "človek") or
@@ -209,6 +225,13 @@ class Othello:
                         k += 1
                 else:
                     pass
+    def preskok(self):
+        if ni_poteze(barva, polje):
+           self.na_potezi = drugi(self.na_potezi) 
+                    
+                    
+                
+            
                     
 
 ##    for otrok in okvir.winfo_children():
