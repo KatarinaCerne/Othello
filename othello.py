@@ -65,10 +65,6 @@ class Othello:
 
         master.title('Othello')
 
-##        okvir = Frame(root, padx=10, pady=10)
-##        okvir.configure(background="#F2F7BB")
-##        okvir.grid(column=0, row=0)
-
         #meni#
         menu = Menu(master)
         master.config(menu=menu)
@@ -228,18 +224,10 @@ class Othello:
     def preskok(self):
         if ni_poteze(barva, polje):
            self.na_potezi = drugi(self.na_potezi) 
-                    
-                    
-                
-            
-                    
 
-##    for otrok in okvir.winfo_children():
-##        otrok.grid_configure(padx=4, pady=2)
-   
-
+                    
 master = Tk()
-Othello(master)
+aplikacija = Othello(master)
 master.resizable(width=FALSE, height=FALSE) 
 master.mainloop()       
 
