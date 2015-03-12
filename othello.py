@@ -43,7 +43,8 @@ def seznam_sosedov(i, j) :
         else:
             return [[i-1, j],[i+1, j],[i-1,j+1],[i,j+1],[i+1,j+1],[i-1,j-1],[i,j-1],[i+1,j-1]]
 
-def ni_poteze(barva, polje):
+def mozne_poteze(barva, polje):
+    sez_moznosti=[]
     for i,st in enumerate(polje):
             for j,vr in enumerate(st):
                 if vr != None:
@@ -55,10 +56,10 @@ def ni_poteze(barva, polje):
                         di = i1-i
                         dj = j1-j
                         if veljavna(barva, di, dj, polje, i, j):
-                            return False
+                            sez_moznosti.append((i,j))
                         else:
                             pass
-    return True
+    return sez_moznosti
 
 class Othello:
     def __init__(self, master):
@@ -194,6 +195,7 @@ class Othello:
             self.racunalnik_odigraj_potezo()
 
     def odigraj(self, i, j):
+
         #če je polje prazno in poteza veljavna, se poteza odigra
         seznam_veljavnosti=[veljavna(self.na_potezi,el[0]-i,el[1]-j,self.polje,i,j) for el in seznam_sosedov(i,j)
                             if self.na_potezi != self.polje[el[0]][el[1]] and self.polje[el[0]][el[1]] != None]
@@ -206,6 +208,9 @@ class Othello:
                 self.narisiBelega(i,j)
             self.preobrni(i,j)
             self.na_potezi = drugi(self.na_potezi)
+            
+            self.preskok()
+            
             self.napis.set("Na potezi je " + self.na_potezi)
             self.napiscrni.set("Črni: "+str(self.stejcrne))
             self.napisbeli.set("Beli: "+str(self.stejbele))
@@ -361,8 +366,11 @@ class Othello:
                 else:
                     pass
     def preskok(self):
-        if ni_poteze(barva, polje):
-           self.na_potezi = drugi(self.na_potezi) 
+        if mozne_poteze(self.na_potezi, self.polje) == []:
+           self.na_potezi = drugi(self.na_potezi)
+           print(mozne_poteze)
+        else:
+            print(mozne_poteze)
 
                     
 master = Tk()
