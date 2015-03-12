@@ -208,7 +208,8 @@ class Othello:
                 self.narisiBelega(i,j)
             self.preobrni(i,j)
             self.na_potezi = drugi(self.na_potezi)
-            
+
+            print(mozne_poteze(self.na_potezi, self.polje))
             self.preskok()
             
             self.napis.set("Na potezi je " + self.na_potezi)
@@ -368,9 +369,6 @@ class Othello:
     def preskok(self):
         if mozne_poteze(self.na_potezi, self.polje) == []:
            self.na_potezi = drugi(self.na_potezi)
-           print(mozne_poteze)
-        else:
-            print(mozne_poteze)
 
                     
 master = Tk()
