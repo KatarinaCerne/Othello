@@ -202,6 +202,20 @@ class Othello:
         if self.crni == 'računalnik':
             self.racunalnik_odigraj_potezo()
 
+    def povleci(self, poteza):
+        """Povleci dano potezo."""
+        (i,j) = poteza
+        self.polje[i][j] = self.na_potezi
+        self.na_potezi = drugi(self.na_potezi)
+        self.poteza += 1
+
+    def preklici(self, poteza):
+        """Prekliči dano potezo."""
+        (i,j) = poteza
+        self.polje[i][j] = None
+        self.na_potezi = drugi(self.na_potezi)
+        self.poteza -= 1
+
     def odigraj(self, i, j):
         #če je polje prazno in poteza veljavna, se poteza odigra
 
@@ -269,31 +283,32 @@ class Othello:
 
     def vrednost(self):
         '''Oceni vrednost pozicije za igralca. Ta ocena je hevristična (ni nujno pravilna).'''
-        # Denimo, da imamo
-        #  3 = igralec ima trojko (je zmagal)
-        #  2 = igralec ima dvojko (in nima trojke)
-        #  1 = igralec ima enojko (in nima dvojke ali trojke)
-        #  0 = nihče nima ničesar
-        # -1 = nasprotnik ima enojko
-        # -2 = nasprotnik ima dvojko
-        # -3 = nasprotnik ima trojko
+
         igralec = self.na_potezi
-        nasprotnik = drugi_igralec(self.na_potezi)
+        nasprotnik = drugi(self.na_potezi)
         max_igralec = 0 # Največ, kar ima v tej poziciji igralec
         max_nasprotnik = 0 # Največ, kar ima v tej poziciji nasprotnik
-        for t in trojke:
-            # Za vsako trojko preštejemo, koliko je v njej znakov igralca in koliko znakov nasprotnika
-            igr = 0
-            nas = 0
-            for (i,j) in t:
-                if self.polje[i][j] == igralec: igr = igr + 1
-                if self.polje[i][j] == nasprotnik: nas = nas + 1
-            if nas == 0: max_igralec = max(igr, max_igralec)
-            if igr == 0: max_nasprotnik = max(nas, max_nasprotnik)
-        if max_igralec >= max_nasprotnik:
-            return max_igralec
-        else:
-            return -max_nasprotnik
+
+
+##        
+##            return max_igralec
+##        else:
+##            return -max_nasprotnik
+
+    def naslednja_poteza(self, na_potezi, mozne_poteze):
+        # pogleda vsak gib in izbere tistega, ki mu prinese najveè žetonov
+        najboljsa_poteza = None
+        najboljsa_vrednost = -1
+        for poteza in mozne_poteze:
+            x,y,situacija = poteza
+            
+            k = 0
+            for zeton in zetoni.values():
+                if zeton == igralec: k = k + 1
+            if k > najboljsa_vrednost:
+                najboljsa_vrednost = k
+                najboljsa_poteza = poteza
+        return najboljsa_poteza
 
     def minimax(self,globina):
         # Preverimo, ali je treba končati z razmišljanjem
@@ -306,8 +321,8 @@ class Othello:
             # Izberemo najboljšo potezo.
             p = None # Najboljša do sedaj videna poteza
             vrednost_p = -4   # Manj kot najmanjša možna vrednost pozicije
-            for i in (0,1,2):
-                for j in (0,1,2):
+            for i in range(8):
+                for j in range(8):
                     if self.polje[i][j] == None:
                         # Polje (i,j) ni zasedeno, lahko igramo
                         # Naredimo potezo (i,j) in ocenimo rekurzivno
