@@ -46,8 +46,8 @@ def seznam_sosedov(i, j) :
 def mozne_poteze(barva, polje):
     """Vrne seznam možnih potez, ki jih ima doloèen igralec na doloèenem polju"""
     sez_moznosti=[]
-    for i,st in enumerate(polje):
-            for j,vr in enumerate(st):
+    for j,st in enumerate(polje):
+            for i,vr in enumerate(st):
                 if vr != None:
                     pass
                 else:
@@ -56,9 +56,12 @@ def mozne_poteze(barva, polje):
                         j1 = el[1]
                         di = i1-i
                         dj = j1-j
-                        if veljavna(barva, di, dj, polje, i, j) and (i,j) not in sez_moznosti:
+                        if veljavna(barva, di, dj, polje, i, j):
+                        #and (i,j) not in sez_moznosti:
                             sez_moznosti.append((i,j))
+                            #print(i,j)
                         else:
+                            #print(i,j,"ne")
                             pass
     return sez_moznosti
 
@@ -230,7 +233,9 @@ class Othello:
                 self.narisiCrnega(i,j)
             else:
                 self.narisiBelega(i,j)
+        
             self.preobrni(i,j)
+            print(self.polje)
             self.na_potezi = drugi(self.na_potezi)
 
             print(self.na_potezi)
@@ -288,6 +293,7 @@ class Othello:
         nasprotnik = drugi(self.na_potezi)
         max_igralec = 0 # Največ, kar ima v tej poziciji igralec
         max_nasprotnik = 0 # Največ, kar ima v tej poziciji nasprotnik
+        
 
 
 ##        
@@ -355,6 +361,7 @@ class Othello:
         self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="black")
         self.stejcrne+=1
         self.zetoni[i][j] = self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="black")
+        self.polje[i][j] = "Èrni"
 
     def narisiBelega(self, i, j):
         """Nariše bel žeton"""
@@ -363,6 +370,7 @@ class Othello:
         self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="white")
         self.stejbele+=1
         self.zetoni[i][j] = self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="white")
+        self.polje[i][j] = "Beli"
 
 
     def preobrni(self, i, j):
