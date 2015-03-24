@@ -13,8 +13,12 @@ def veljavna(barva, di, dj, polje, i, j):
     while polje[i+k*di][j+k*dj] == drugi(barva):
         if (i+k*di,di) == (7,1) or (i+k*di,di) == (0,-1) or (j+k*dj,dj) == (7,1) or (j+k*dj,dj) == (0,-1):
             return False
+        #print("*",i+k*di,j+k*dj)
         k+=1
-    if polje[i+k*di][j+k*dj] == barva:
+    if k == 1:
+        return False
+    elif polje[i+k*di][j+k*dj] == barva:
+        #print("**",i+k*di,j+k*dj)
         return True
     else:
         return False
@@ -57,6 +61,7 @@ def mozne_poteze(barva, polje):
                         di = i1-i
                         dj = j1-j
                         if veljavna(barva, di, dj, polje, i, j):
+                            #print(i,j)
                         #and (i,j) not in sez_moznosti:
                             sez_moznosti.append((i,j))
                             #print(i,j)
