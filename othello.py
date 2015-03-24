@@ -8,17 +8,16 @@ def drugi(igr):
         return "Črni"
 
 def veljavna(barva, di, dj, polje, i, j):
-    """Če je poteza veljavna, vrne True, sicer vrne False"""
+    """Če je poteza na polju (i,j) veljavna, vrne True, sicer vrne False"""
     k=1
+    #print(k,"*",i+k*di, j+k*dj, polje[i+k*di][j+k*dj])
     while polje[i+k*di][j+k*dj] == drugi(barva):
         if (i+k*di,di) == (7,1) or (i+k*di,di) == (0,-1) or (j+k*dj,dj) == (7,1) or (j+k*dj,dj) == (0,-1):
             return False
-        #print("*",i+k*di,j+k*dj)
+        #print("**",i+k*di, j+k*dj, polje[i+k*di][j+k*dj])
         k+=1
-    if k == 1:
-        return False
-    elif polje[i+k*di][j+k*dj] == barva:
-        #print("**",i+k*di,j+k*dj)
+    print(k,polje[i+k*di][j+k*dj],i+k*di, j+k*dj)
+    if polje[i+k*di][j+k*dj] == barva:
         return True
     else:
         return False
@@ -53,20 +52,16 @@ def mozne_poteze(barva, polje):
     for j,st in enumerate(polje):
             for i,vr in enumerate(st):
                 if vr != None:
-                    pass
+                    print(vr)
                 else:
                     for el in seznam_sosedov(i, j):
                         i1 = el[0]
                         j1 = el[1]
                         di = i1-i
                         dj = j1-j
-                        if veljavna(barva, di, dj, polje, i, j):
-                            #print(i,j)
-                        #and (i,j) not in sez_moznosti:
+                        if veljavna(barva, di, dj, polje, i, j) and (i,j) not in sez_moznosti:
                             sez_moznosti.append((i,j))
-                            #print(i,j)
                         else:
-                            #print(i,j,"ne")
                             pass
     return sez_moznosti
 
@@ -136,15 +131,15 @@ class Othello:
         if self.stejcrne == 0:
             return "Beli"
         elif self.stejbele == 0:
-            return "Èrni"
+            return "Črni"
         else:           
             if self.stejcrne + self.stejbele == 64:     
                 if self.stejcrne > self.stejbele:
-                    return "Èrni"
+                    return "Črni"
                 elif self.stejbele >self.stejcrne:
                     return "Beli"
                 else:
-                    return "Neodloèeno"
+                    return "Neodločeno"
             else:
                 return None
 
@@ -207,22 +202,22 @@ class Othello:
         self.polje[4][3] = "Beli"
 
         
-        if self.crni == 'računalnik':
-            self.racunalnik_odigraj_potezo()
+##        if self.crni == 'računalnik':
+##            self.racunalnik_odigraj_potezo()
 
-    def povleci(self, poteza):
-        """Povleci dano potezo."""
-        (i,j) = poteza
-        self.polje[i][j] = self.na_potezi
-        self.na_potezi = drugi(self.na_potezi)
-        self.poteza += 1
-
-    def preklici(self, poteza):
-        """Prekliči dano potezo."""
-        (i,j) = poteza
-        self.polje[i][j] = None
-        self.na_potezi = drugi(self.na_potezi)
-        self.poteza -= 1
+##    def povleci(self, poteza):
+##        """Povleci dano potezo."""
+##        (i,j) = poteza
+##        self.polje[i][j] = self.na_potezi
+##        self.na_potezi = drugi(self.na_potezi)
+##        self.poteza += 1
+##
+##    def preklici(self, poteza):
+##        """Prekliči dano potezo."""
+##        (i,j) = poteza
+##        self.polje[i][j] = None
+##        self.na_potezi = drugi(self.na_potezi)
+##        self.poteza -= 1
 
     def odigraj(self, i, j):
         #če je polje prazno in poteza veljavna, se poteza odigra
@@ -230,6 +225,7 @@ class Othello:
         #vsebuje True, èe obstaja veljavna poteza na tem polju
         seznam_veljavnosti=[veljavna(self.na_potezi,el[0]-i,el[1]-j,self.polje,i,j) for el in seznam_sosedov(i,j)
                             if self.na_potezi != self.polje[el[0]][el[1]] and self.polje[el[0]][el[1]] != None]
+        print(seznam_veljavnosti)
         
         
         if self.polje[i][j] is None and True in seznam_veljavnosti:
@@ -240,115 +236,115 @@ class Othello:
                 self.narisiBelega(i,j)
         
             self.preobrni(i,j)
-            print(self.polje)
+            #print(self.polje)
             self.na_potezi = drugi(self.na_potezi)
 
             print(self.na_potezi)
             print(mozne_poteze(self.na_potezi, self.polje))
-            self.preskok() #Ne dela.
+            #self.preskok() #Ne dela.
             
             self.napis.set("Na potezi je " + self.na_potezi)
             self.napiscrni.set("Črni: "+str(self.stejcrne))
             self.napisbeli.set("Beli: "+str(self.stejbele))
 
             r = self.konec_igre()
-            if r == "Neodloèeno":
+            if r == "Neodločeno":
                 self.na_potezi = None
                 self.napis.set("Neodločeno")
             elif r is not None:
                 self.napis.set('Zmagal je ' + r)
-            else:
-                # Preverimo, ali mora računalnik odigrati potezo
-                if ((self.na_potezi == "Èrni" and self.crni == "računalnik") or
-                    (self.na_potezi == "Beli" and self.beli == "računalnik")):
-                    # Namesto, da bi neposredno poklicali self.racunalnik_odigraj_potezo,
-                    # to naredimo z zamikom, da se lahko prejšnja poteza sploh nariše.
-                    self.canvas.after(100, self.racunalnik_odigraj_potezo)
+##            else:
+##                # Preverimo, ali mora računalnik odigrati potezo
+##                if ((self.na_potezi == "Črni" and self.crni == "računalnik") or
+##                    (self.na_potezi == "Beli" and self.beli == "računalnik")):
+##                    # Namesto, da bi neposredno poklicali self.racunalnik_odigraj_potezo,
+##                    # to naredimo z zamikom, da se lahko prejšnja poteza sploh nariše.
+##                    self.canvas.after(100, self.racunalnik_odigraj_potezo)
 
     
-    def racunalnik_odigraj_potezo(self): #kaj se tu dogaja?
-        '''Računalnik odigra naslednjo potezo.'''
-        # Naredimo vzporedno vlakno
-        self.mislec_poteza = None
-        self.mislec_stop = False
-        self.mislec = threading.Thread(target=self.razmisljaj)
-        # Poženemo vzporedno vlakno
-        self.mislec.start()
-        # Čez 0.1 sekunde preverimo, ali je self.mislec končal
-        self.canvas.after(100, self.mislec_preveri_konec)
-
-    def razmisljaj(self):
-        (p, vrednost_p) = self.minimax(9)
-        self.mislec_poteza = p
-        self.mislec = None
-
-    def mislec_preveri_konec(self):
-        if self.mislec_poteza == None:
-            # self.mislec ni končal, preverimo še enkrat čez 0.1 sekunde
-            self.canvas.after(100, self.mislec_preveri_konec)
-        else:
-            # self.mislec je končal, povlečemo potezo
-            (i,j) = self.mislec_poteza
-            self.odigraj_potezo(i,j)
-
-    def vrednost(self):
-        '''Oceni vrednost pozicije za igralca. Ta ocena je hevristična (ni nujno pravilna).'''
-
-        igralec = self.na_potezi
-        nasprotnik = drugi(self.na_potezi)
-        max_igralec = 0 # Največ, kar ima v tej poziciji igralec
-        max_nasprotnik = 0 # Največ, kar ima v tej poziciji nasprotnik
-        
-
-
-##        
-##            return max_igralec
+##    def racunalnik_odigraj_potezo(self): #kaj se tu dogaja?
+##        '''Računalnik odigra naslednjo potezo.'''
+##        # Naredimo vzporedno vlakno
+##        self.mislec_poteza = None
+##        self.mislec_stop = False
+##        self.mislec = threading.Thread(target=self.razmisljaj)
+##        # Poženemo vzporedno vlakno
+##        self.mislec.start()
+##        # Čez 0.1 sekunde preverimo, ali je self.mislec končal
+##        self.canvas.after(100, self.mislec_preveri_konec)
+##
+##    def razmisljaj(self):
+##        (p, vrednost_p) = self.minimax(9)
+##        self.mislec_poteza = p
+##        self.mislec = None
+##
+##    def mislec_preveri_konec(self):
+##        if self.mislec_poteza == None:
+##            # self.mislec ni končal, preverimo še enkrat čez 0.1 sekunde
+##            self.canvas.after(100, self.mislec_preveri_konec)
 ##        else:
-##            return -max_nasprotnik
-
-    def naslednja_poteza(self, na_potezi, mozne_poteze):
-        # pogleda vsak gib in izbere tistega, ki mu prinese najveè žetonov
-        najboljsa_poteza = None
-        najboljsa_vrednost = -1
-        for poteza in mozne_poteze:
-            x,y,situacija = poteza
-            
-            k = 0
-            for zeton in zetoni.values():
-                if zeton == igralec: k = k + 1
-            if k > najboljsa_vrednost:
-                najboljsa_vrednost = k
-                najboljsa_poteza = poteza
-        return najboljsa_poteza
-
-    def minimax(self,globina):
-        # Preverimo, ali je treba končati z razmišljanjem
-        if self.mislec_stop: return (None, 0)
-        if globina == 0 or self.konec_igre() != None:
-            # Dosegli smo globino 0 ali pa je konec igre, vrnemo oceno za vrednost
-            return (None, self.vrednost())
-        else:
-            # Za vsako možno potezo ocenimo, koliko je vredna.
-            # Izberemo najboljšo potezo.
-            p = None # Najboljša do sedaj videna poteza
-            vrednost_p = -4   # Manj kot najmanjša možna vrednost pozicije
-            for i in range(8):
-                for j in range(8):
-                    if self.polje[i][j] == None:
-                        # Polje (i,j) ni zasedeno, lahko igramo
-                        # Naredimo potezo (i,j) in ocenimo rekurzivno
-                        self.polje[i][j] = self.na_potezi
-                        self.na_potezi = drugi_igralec(self.na_potezi)
-                        (q, vrednost_q) = self.minimax(globina-1)
-                        # Izničimo potezo (i,j)
-                        self.polje[i][j] = None
-                        self.na_potezi = drugi_igralec(self.na_potezi)
-                        vrednost_q = -vrednost_q
-                        if vrednost_q > vrednost_p:
-                            # Ta poteza je boljša od poteze p
-                            p = (i,j)
-                            vrednost_p = vrednost_q
-            return (p, vrednost_p)
+##            # self.mislec je končal, povlečemo potezo
+##            (i,j) = self.mislec_poteza
+##            self.odigraj_potezo(i,j)
+##
+##    def vrednost(self):
+##        '''Oceni vrednost pozicije za igralca. Ta ocena je hevristična (ni nujno pravilna).'''
+##
+##        igralec = self.na_potezi
+##        nasprotnik = drugi(self.na_potezi)
+##        max_igralec = 0 # Največ, kar ima v tej poziciji igralec
+##        max_nasprotnik = 0 # Največ, kar ima v tej poziciji nasprotnik
+##        
+##
+##
+####        
+####            return max_igralec
+####        else:
+####            return -max_nasprotnik
+##
+##    def naslednja_poteza(self, na_potezi, mozne_poteze):
+##        # pogleda vsak gib in izbere tistega, ki mu prinese najveè žetonov
+##        najboljsa_poteza = None
+##        najboljsa_vrednost = -1
+##        for poteza in mozne_poteze:
+##            x,y,situacija = poteza
+##            
+##            k = 0
+##            for zeton in zetoni.values():
+##                if zeton == igralec: k = k + 1
+##            if k > najboljsa_vrednost:
+##                najboljsa_vrednost = k
+##                najboljsa_poteza = poteza
+##        return najboljsa_poteza
+##
+##    def minimax(self,globina):
+##        # Preverimo, ali je treba končati z razmišljanjem
+##        if self.mislec_stop: return (None, 0)
+##        if globina == 0 or self.konec_igre() != None:
+##            # Dosegli smo globino 0 ali pa je konec igre, vrnemo oceno za vrednost
+##            return (None, self.vrednost())
+##        else:
+##            # Za vsako možno potezo ocenimo, koliko je vredna.
+##            # Izberemo najboljšo potezo.
+##            p = None # Najboljša do sedaj videna poteza
+##            vrednost_p = -4   # Manj kot najmanjša možna vrednost pozicije
+##            for i in range(8):
+##                for j in range(8):
+##                    if self.polje[i][j] == None:
+##                        # Polje (i,j) ni zasedeno, lahko igramo
+##                        # Naredimo potezo (i,j) in ocenimo rekurzivno
+##                        self.polje[i][j] = self.na_potezi
+##                        self.na_potezi = drugi_igralec(self.na_potezi)
+##                        (q, vrednost_q) = self.minimax(globina-1)
+##                        # Izničimo potezo (i,j)
+##                        self.polje[i][j] = None
+##                        self.na_potezi = drugi_igralec(self.na_potezi)
+##                        vrednost_q = -vrednost_q
+##                        if vrednost_q > vrednost_p:
+##                            # Ta poteza je boljša od poteze p
+##                            p = (i,j)
+##                            vrednost_p = vrednost_q
+##            return (p, vrednost_p)
 
 
     def klik(self, event):
@@ -360,13 +356,13 @@ class Othello:
             self.odigraj(i, j)
                 
     def narisiCrnega(self, i, j):
-        """Nariše èrn žeton"""
+        """Nariše črn žeton"""
         x = i * 50
         y = j * 50
         self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="black")
         self.stejcrne+=1
         self.zetoni[i][j] = self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="black")
-        self.polje[i][j] = "Èrni"
+        self.polje[i][j] = "Črni"
 
     def narisiBelega(self, i, j):
         """Nariše bel žeton"""
