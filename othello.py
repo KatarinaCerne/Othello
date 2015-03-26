@@ -308,6 +308,7 @@ class Othello:
         else:
             # self.mislec je končal, povlečemo potezo
             (i,j) = self.mislec_poteza
+            print("+",i,j)
             self.odigraj(i,j)
 
     def vrednost(self):
@@ -326,27 +327,31 @@ class Othello:
 ##            return -max_nasprotnik
 
     def naslednja_poteza(self):
-        # pogleda vsak gib in izbere tistega, ki mu prinese najveè žetonov???
-        #to ne dela
+        #moral bi pogledati vsak gib in izbrati tistega, ki mu prinese najveè žetonov
+        #ne dela, odigra prvo potezo
+        barva = self.na_potezi
         najboljsa_poteza = None
         najboljsa_vrednost = -1
-        for poteza in mozne_poteze(self.na_potezi, self.polje):
+        for poteza in mozne_poteze(barva, self.polje):
             stanje = self.polje
+            #print(stanje)
             x,y = poteza
-            print(poteza)
-            stanje = preobrni1(self.na_potezi, self.polje, x, y)
-            print(stanje)
+            #print(poteza)
+            #novo_stanje = preobrni1(barva, stanje, x, y)
+            #novo_stanje[x][y] = barva
+            #print(self.polje)
+            #print(stanje)
             k = 0
             for st in stanje:
                 for zeton in st:
-                    print(zeton)
+                    #print(zeton)
                     if zeton == self.na_potezi:
                         k = k + 1
             print(k)
             if k > najboljsa_vrednost:
                 najboljsa_vrednost = k
                 najboljsa_poteza = poteza
-                print("*",najboljsa_poteza)
+        print("*",najboljsa_poteza)
         return najboljsa_poteza 
 
 ##    if max_igr >= max_nas:
