@@ -9,6 +9,8 @@ def drugi(igr):
 
 def veljavna(barva, di, dj, polje, i, j):
     """Če je poteza na polju (i,j) veljavna, vrne True, sicer vrne False"""
+    #if polje[i][j]!= None:
+        #return False
     k=1
     #print(k,"*",i+k*di, j+k*dj, polje[i+k*di][j+k*dj])
     while polje[i+k*di][j+k*dj] == drugi(barva):
@@ -16,8 +18,8 @@ def veljavna(barva, di, dj, polje, i, j):
             return False
         #print("**",i+k*di, j+k*dj, polje[i+k*di][j+k*dj])
         k+=1
-    print(k,polje[i+k*di][j+k*dj],i+k*di, j+k*dj)
-    if polje[i+k*di][j+k*dj] == barva:
+    #print(k,polje[i+k*di][j+k*dj],i+k*di, j+k*dj)
+    if polje[i+k*di][j+k*dj] == barva and k>1:
         return True
     else:
         return False
@@ -52,7 +54,7 @@ def mozne_poteze(barva, polje):
     for j,st in enumerate(polje):
             for i,vr in enumerate(st):
                 if vr != None:
-                    print(vr)
+                    pass
                 else:
                     for el in seznam_sosedov(i, j):
                         i1 = el[0]
@@ -225,7 +227,7 @@ class Othello:
         #vsebuje True, èe obstaja veljavna poteza na tem polju
         seznam_veljavnosti=[veljavna(self.na_potezi,el[0]-i,el[1]-j,self.polje,i,j) for el in seznam_sosedov(i,j)
                             if self.na_potezi != self.polje[el[0]][el[1]] and self.polje[el[0]][el[1]] != None]
-        print(seznam_veljavnosti)
+        #print(seznam_veljavnosti)
         
         
         if self.polje[i][j] is None and True in seznam_veljavnosti:
