@@ -1,3 +1,5 @@
+import random
+
 POS_INFINITY = 100000000000
 NEG_INFINITY = -POS_INFINITY
 
@@ -17,7 +19,7 @@ class Alphabeta():
 
   def alphabeta(self, globina, alpha, beta, igralec):
     self.pozicije += 1 # Povečaj število pregledanih pozicij
-    if globina == 0 or self.igra.konec():
+    if globina == 0 or self.igra.konec() != None:
         # Dosegli smo globino 0 ali pa je konec igre, vrnemo oceno za vrednost
         vrednost = self.igra.vrednost()
         if not igralec: vrednost = -vrednost
@@ -27,7 +29,9 @@ class Alphabeta():
           # Na potezi je igralec, vrednost igre maksimiziramo
           p = None                  # Najboljša do sedaj videna poteza
           vrednost_p = NEG_INFINITY # Vrednost do sedaj najboljše videne poteze
-          for poteza in self.igra.poteze():
+          poteze = self.igra.poteze()
+          random.shuffle(poteze)
+          for poteza in poteze:
             self.igra.povleci(poteza)
             (q, vrednost_q) = self.alphabeta(globina-1, alpha, beta, False)
             self.igra.preklici(poteza)
