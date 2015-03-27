@@ -1,11 +1,17 @@
 from tkinter import *
 import threading
 
+POS_INFINITY = 100000000000
+NEG_INFINITY = -POS_INFINITY
+
+BELI = "Beli"
+CRNI = "Črni"
+
 def drugi(igr):
-    if igr == "Črni":
-        return "Beli"
+    if igr == CRNI:
+        return BELI
     else:
-        return "Črni"
+        return CRNI
 
 def veljavna(barva, di, dj, polje, i, j):
     """Če je poteza na polju (i,j) veljavna, vrne True, sicer vrne False"""
@@ -49,48 +55,32 @@ def seznam_sosedov(i, j) :
 def mozne_poteze(barva, polje):
     """Vrne seznam možnih potez, ki jih ima določen igralec na določenem polju"""
     sez_moznosti=[]
-    for j,st in enumerate(polje):
-            for i,vr in enumerate(st):
-                if polje[i][j] != None:
-                    pass
-                else:
-                    for el in seznam_sosedov(i, j):
-                        i1 = el[0]
-                        j1 = el[1]
-                        di = i1-i
-                        dj = j1-j
-                        if veljavna(barva, di, dj, polje, i, j) and (i,j) not in sez_moznosti:
-                            sez_moznosti.append((i,j))
-                        else:
-                            pass
+    for j in range(len(polje)):
+        for i in range(len(polje[j])):
+            if polje[i][j] == None:
+                for (i1,j1) in seznam_sosedov(i, j):
+                    di = i1-i
+                    dj = j1-j
+                    if veljavna(barva, di, dj, polje, i, j) and (i,j) not in sez_moznosti:
+                        sez_moznosti.append((i,j))
+                    else:
+                        pass
     return sez_moznosti
 
 ###???###############
 def preobrni1(barva, polje, i, j):
     """Spremeni barve nasprotnikovih žetonov, ki smo jih uklešèili med svoja žetona"""
     seznam = seznam_sosedov(i, j)
-    for el in seznam:
-        i1 = el[0]
-        j1 = el[1]
-        if barva == polje[i1][j1] or polje[i1][j1] == None:
-            pass
-        else:
+    for (i1, j1) in seznam:
+        if polje[i1][j1] == drugi(barva):
             di = i1-i
             dj = j1-j
-            k=1
             if veljavna(barva, di, dj, polje, i, j):
+                k = 1
                 while polje[i+k*di][j+k*dj] == drugi(barva):
                     polje[i+k*di][j+k*dj] = barva
-##                    if barva == "Beli":
-##                        stejcrne-=1
-##                        stejbele+=1
-##                    else:
-##                        stejcrne+=1
-##                        stejbele-=1
                     k += 1
-            else:
-                pass
-    return polje
+
 ###????####################
 
 class Othello:
@@ -113,7 +103,7 @@ class Othello:
         menu.add_cascade(label="Izhod", menu=meni2)
         meni2.add_command(label="Izhod iz igre", command=self.zapri)
         ######
-        
+
         self.na_potezi = None #kdo je na potezi
 
         self.crni = 'človek' #kdo je črni
@@ -137,14 +127,14 @@ class Othello:
         self.canvas.grid(row=2, column=0, columnspan=2)
         self.canvas.bind('<Button-1>', self.klik)
 
-        #seznam, ki vsebuje elemente "None"(prazno polje), "Črni" in "Beli"
+        #seznam, ki vsebuje elemente "None"(prazno polje), CRNI in BELI
         self.polje = [[None for i in range(8)] for j in range(8)]
         #seznam, ki vsebuje krogce(žetone)
         self.zetoni = [[None for i in range(8)] for j in range(8)]
 
 ###??????????###
-        self.mislec = None  #ne vem, kaj je to      
-        self.mislec_poteza = None 
+        self.mislec = None  #ne vem, kaj je to
+        self.mislec_poteza = None
         self.mislec_stop = False
 ###????????####
 
@@ -161,15 +151,15 @@ class Othello:
         '''Ugotovi, ali je konec igre. Vrne None (igre ni konec),
            niz 'Neodločeno' (rezultat je neodločen), ali pa zmagovalca'''
         if self.stejcrne == 0:
-            return "Beli"
+            return BELI
         elif self.stejbele == 0:
-            return "Črni"
-        else:           
-            if self.stejcrne + self.stejbele == 64:     
+            return CRNI
+        else:
+            if self.stejcrne + self.stejbele == 64:
                 if self.stejcrne > self.stejbele:
-                    return "Črni"
+                    return CRNI
                 elif self.stejbele >self.stejcrne:
-                    return "Beli"
+                    return BELI
                 else:
                     return "Neodločeno"
             else:
@@ -186,16 +176,16 @@ class Othello:
             self.mislec.join()
 ###??????????########
 
-        #seznam, ki vsebuje elemente "None"(prazno polje), "Črni" in "Beli"
+        #seznam, ki vsebuje elemente "None"(prazno polje), CRNI in BELI
         self.polje = [[None for i in range(8)] for j in range(8)]
         #seznam, ki vsebuje krogce(žetone)
         self.zetoni = [[None for i in range(8)] for j in range(8)]
 
         self.stejcrne = 2
-        self.stejbele = 2       
+        self.stejbele = 2
 
         #nastavi, da začne črni
-        self.na_potezi = "Črni"
+        self.na_potezi = CRNI
         self.napis.set("Na potezi je črni.")
 
         #nastavi napise za število črnih/belih žetonov
@@ -230,10 +220,10 @@ class Othello:
         self.zetoni[4][3]=self.canvas.create_oval(200+5, 150+5, 200+45, 150+45, fill="white")
         self.zetoni[3][4]=self.canvas.create_oval(150+5, 200+5, 150+45, 200+45, fill="white")
         #začetne žetone doda v self.polje
-        self.polje[3][3] = "Črni"
-        self.polje[4][4] = "Črni"
-        self.polje[3][4] = "Beli"
-        self.polje[4][3] = "Beli"
+        self.polje[3][3] = CRNI
+        self.polje[4][4] = CRNI
+        self.polje[3][4] = BELI
+        self.polje[4][3] = BELI
 
         if self.crni == 'računalnik':
             self.racunalnik_odigraj_potezo()
@@ -256,25 +246,26 @@ class Othello:
         """Če je polje prazno in poteza veljavna, se poteza odigra."""
 
         #seznam vsebuje True, če je poteza na polju (i,j) veljavna
-        seznam_veljavnosti=[veljavna(self.na_potezi,el[0]-i,el[1]-j,self.polje,i,j) for el in seznam_sosedov(i,j)
-                            if self.na_potezi != self.polje[el[0]][el[1]] and self.polje[el[0]][el[1]] != None]
-        
-        
-        if self.polje[i][j] is None and True in seznam_veljavnosti:
+        je_veljavna = False
+        for (dx, dy) in [(-1,0), (1,0), (0,-1), (0,1), (1,1), (1,-1), (-1,1), (-1,-1)]:
+            je_veljavna = veljavna(self.na_potezi, dx, dy, self.polje, i, j)
+            if je_veljavna: break
+
+        if self.polje[i][j] is None and je_veljavna:
             self.polje[i][j] = self.na_potezi
-            if self.na_potezi == "Črni":
+            if self.na_potezi == CRNI:
                 self.narisiCrnega(i,j)
             else:
                 self.narisiBelega(i,j)
-        
-            self.preobrni(i,j) #ukleščeni žetoni spremenijo barvo
+
+            self.preobrni(i,j) # ukleščeni žetoni spremenijo barvo
             self.na_potezi = drugi(self.na_potezi)
 
             print(self.na_potezi)
             print(mozne_poteze(self.na_potezi, self.polje))
             self.preskok() #Če igralec ne more narediti nobene veljavne poteze, je preskočen
                            #Ali deluje pravilno? (+ dodaj napis)
-            
+
             self.napis.set("Na potezi je " + self.na_potezi)
             self.napiscrni.set("Črni: "+str(self.stejcrne))
             self.napisbeli.set("Beli: "+str(self.stejbele))
@@ -287,14 +278,14 @@ class Othello:
                 self.napis.set('Zmagal je ' + r)
             else:
                 # Preverimo, ali mora računalnik odigrati potezo
-                if ((self.na_potezi == "Črni" and self.crni == "računalnik") or
-                    (self.na_potezi == "Beli" and self.beli == "računalnik")):
+                if ((self.na_potezi == CRNI and self.crni == "računalnik") or
+                    (self.na_potezi == BELI and self.beli == "računalnik")):
                     # Namesto, da bi neposredno poklicali self.racunalnik_odigraj_potezo,
                     # to naredimo z zamikom, da se lahko prejšnja poteza sploh nariše.
                     self.canvas.after(100, self.racunalnik_odigraj_potezo)
 
 
-###??????????????############   
+###??????????????############
     def racunalnik_odigraj_potezo(self):
         '''Računalnik odigra naslednjo potezo.'''
         # Naredimo vzporedno vlakno
@@ -309,7 +300,7 @@ class Othello:
     def razmisljaj(self):
         #(p, vrednost_p) = self.minimax(9)
         self.mislec_poteza = self.naslednja_poteza()
-        self.mislec = None
+        self.mislec = None # Pobrišemo objekt, ki predstavlja vlakno
 
     def mislec_preveri_konec(self):
         if self.mislec_poteza == None:
@@ -320,7 +311,7 @@ class Othello:
             (i,j) = self.mislec_poteza
             self.odigraj(i,j)
 ###??????????????#####
-            
+
 ##    def vrednost(self):
 ##        '''Oceni vrednost pozicije za igralca. Ta ocena je hevristična (ni nujno pravilna).'''
 ##
@@ -336,10 +327,8 @@ class Othello:
         barva = self.na_potezi
         najboljsa_poteza = None
         najboljsa_vrednost = -1
-        for poteza in mozne_poteze(barva, self.polje):
+        for (x,y) in mozne_poteze(barva, self.polje):
             stanje = self.polje
-            #print(stanje)
-            x,y = poteza
             #print(poteza)
             #novo_stanje = preobrni1(barva, stanje, x, y)
             #novo_stanje[x][y] = barva
@@ -356,46 +345,16 @@ class Othello:
                 najboljsa_vrednost = k
                 najboljsa_poteza = poteza
         print("*",najboljsa_poteza)
-        return najboljsa_poteza 
-
-##    def minimax(self,globina):
-##        # Preverimo, ali je treba končati z razmišljanjem
-##        if self.mislec_stop: return (None, 0)
-##        if globina == 0 or self.konec_igre() != None:
-##            # Dosegli smo globino 0 ali pa je konec igre, vrnemo oceno za vrednost
-##            return (None, self.vrednost())
-##        else:
-##            # Za vsako možno potezo ocenimo, koliko je vredna.
-##            # Izberemo najboljšo potezo.
-##            p = None # Najboljša do sedaj videna poteza
-##            vrednost_p = -4   # Manj kot najmanjša možna vrednost pozicije
-##            for i in range(8):
-##                for j in range(8):
-##                    if self.polje[i][j] == None:
-##                        # Polje (i,j) ni zasedeno, lahko igramo
-##                        # Naredimo potezo (i,j) in ocenimo rekurzivno
-##                        self.polje[i][j] = self.na_potezi
-##                        self.na_potezi = drugi_igralec(self.na_potezi)
-##                        (q, vrednost_q) = self.minimax(globina-1)
-##                        # Izničimo potezo (i,j)
-##                        self.polje[i][j] = None
-##                        self.na_potezi = drugi_igralec(self.na_potezi)
-##                        vrednost_q = -vrednost_q
-##                        if vrednost_q > vrednost_p:
-##                            # Ta poteza je boljša od poteze p
-##                            p = (i,j)
-##                            vrednost_p = vrednost_q
-##            return (p, vrednost_p)
-
+        return najboljsa_poteza
 
     def klik(self, event):
         """Ko klikneš, se odigra poteza"""
-        if ((self.na_potezi == "Črni" and self.crni == "človek") or
-            (self.na_potezi == "Beli" and self.beli == "človek")):
+        if ((self.na_potezi == CRNI and self.crni == "človek") or
+            (self.na_potezi == BELI and self.beli == "človek")):
             i = int(event.x / 50)
             j = int(event.y / 50)
             self.odigraj(i, j)
-                
+
     def narisiCrnega(self, i, j):
         """Nariše črn žeton"""
         x = i * 50
@@ -403,7 +362,7 @@ class Othello:
         self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="black")
         self.stejcrne+=1
         self.zetoni[i][j] = self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="black")
-        self.polje[i][j] = "Črni"
+        self.polje[i][j] = CRNI
 
     def narisiBelega(self, i, j):
         """Nariše bel žeton"""
@@ -412,7 +371,7 @@ class Othello:
         self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="white")
         self.stejbele+=1
         self.zetoni[i][j] = self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="white")
-        self.polje[i][j] = "Beli"
+        self.polje[i][j] = BELI
 
 
     def preobrni(self, i, j):
@@ -431,7 +390,7 @@ class Othello:
                 if veljavna(barva, di, dj, self.polje, i, j):
                     while self.polje[i+k*di][j+k*dj] == drugi(barva):
                         self.polje[i+k*di][j+k*dj] = barva
-                        if barva == "Beli":
+                        if barva == BELI:
                             self.canvas.itemconfig(self.zetoni[i+k*di][j+k*dj], fill="white")
                             self.stejcrne-=1
                             self.stejbele+=1
@@ -442,17 +401,17 @@ class Othello:
                         k += 1
                 else:
                     pass
-                
+
     def preskok(self):
         """Če igralec ne more storiti ničesar (nobena poteza ni veljavna), ga preskoči"""
         if mozne_poteze(self.na_potezi, self.polje) == []:
             print("ni ok")
             self.na_potezi = drugi(self.na_potezi)
 
-                    
+
 master = Tk()
 aplikacija = Othello(master)
-master.resizable(width=FALSE, height=FALSE) 
-master.mainloop()       
+master.resizable(width=FALSE, height=FALSE)
+master.mainloop()
 
-        
+
