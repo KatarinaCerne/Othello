@@ -29,11 +29,12 @@ class Alphabeta():
           # Na potezi je igralec, vrednost igre maksimiziramo
           p = None                  # Najboljša do sedaj videna poteza
           vrednost_p = NEG_INFINITY # Vrednost do sedaj najboljše videne poteze
-          poteze = self.igra.poteze()
-          random.shuffle(poteze)
-          for poteza in poteze:
+          mozne_poteze = self.igra.poteze(self.igra.na_potezi)
+          random.shuffle(mozne_poteze)
+          for poteza in mozne_poteze:
             self.igra.povleci(poteza)
-            (q, vrednost_q) = self.alphabeta(globina-1, alpha, beta, False)
+            (q, vrednost_q) = self.alphabeta(globina-1, alpha, beta, False)#tale False. poglej ga. ni kul. kaj če nima potez?
+                                                                            #info: če nima poteze, je vrednost -1000000000 oz 100000000
             self.igra.preklici(poteza)
             if vrednost_q > vrednost_p:
               p = poteza
@@ -48,9 +49,9 @@ class Alphabeta():
           # Na potezi je nasprotnik, vrednost igre minimiziramo
           p = None                  # Najboljša do sedaj videna poteza
           vrednost_p = POS_INFINITY # Vrednost do sedaj najboljše videne poteze
-          for poteza in self.igra.poteze():
+          for poteza in self.igra.poteze(self.igra.na_potezi):
             self.igra.povleci(poteza)
-            (q, vrednost_q) = self.alphabeta(globina-1, alpha, beta, True)
+            (q, vrednost_q) = self.alphabeta(globina-1, alpha, beta, True)#tale True. poglej ga.
             self.igra.preklici(poteza)
             if vrednost_q < vrednost_p:
               p = poteza

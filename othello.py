@@ -51,7 +51,6 @@ def seznam_sosedov(i, j) :
         else:
             return [[i-1, j],[i+1, j],[i-1,j+1],[i,j+1],[i+1,j+1],[i-1,j-1],[i,j-1],[i+1,j-1]]
 
-###????####################
 class Igra():
   """Razred, ki predstavlja trenutno stanje igre."""
   def __init__(self):
@@ -89,7 +88,7 @@ class Igra():
     elif self.stejbele == 0:
         return CRNI
     else:
-        if self.stejcrne + self.stejbele == 64:
+        if self.stejcrne + self.stejbele == 64 or self.poteze(CRNI)==self.poteze(BELI)==[]:
             if self.stejcrne > self.stejbele:
                 return CRNI
             elif self.stejbele >self.stejcrne:
@@ -107,7 +106,7 @@ class Igra():
     else:
       return self.stejbele - self.stejcrne
 
-  def poteze(self):
+  def poteze(self, barva):
     """Vrni seznam moznih potez v trenutni poziciji."""
     sez_moznosti=[]
     for j in range(len(self.polje)):
@@ -116,12 +115,12 @@ class Igra():
                 for (i1,j1) in seznam_sosedov(i, j):
                     di = i1-i
                     dj = j1-j
-                    if veljavna(self.na_potezi, di, dj, self.polje, i, j) and (i,j) not in sez_moznosti:
+                    if veljavna(barva, di, dj, self.polje, i, j) and (i,j) not in sez_moznosti:
                         sez_moznosti.append((i,j))
     return sez_moznosti
 
   def povleci(self, poteza, canvas = None, zetoni = None):
-    """Povleci poteza poteza, predpostaviti smemo, da je veljavna."""
+    """Povleci potezo poteza, predpostaviti smemo, da je veljavna."""
     # Preden potezo povlecemo, trenutno stanje spravimo
     polje = [self.polje[i][:] for i in range(8)] # KOPIJA polja
     self.prejsnja_stanja.append([self.na_potezi, self.stejcrne, self.stejbele, polje])
@@ -189,7 +188,6 @@ class Othello:
         meni2.add_command(label="Izhod iz igre", command=self.zapri)
         ######
 
-        # Vse, kar je v vzezi z logiko igre
         self.igra = None # Igre ne igramo trenutno
 
         self.crni = 'človek' #kdo je črni
@@ -213,11 +211,9 @@ class Othello:
         #seznam, ki vsebuje krogce(žetone) od tkinter
         self.zetoni = [[None for i in range(8)] for j in range(8)]
 
-###??????????###
-        self.mislec = None  #ne vem, kaj je to
+        self.mislec = None  
         self.mislec_poteza = None
         self.mislec_stop = False
-###????????####
 
         self.zacni_igro('človek', 'človek')
 
@@ -236,7 +232,7 @@ class Othello:
         self.crni = crni
         self.beli = beli
 
-        # Ce racunalnik se vedno misli, mu povemo, naj neha in pocakamo, da neha
+        #Če racunalnik se vedno misli, mu povemo, naj neha in počakamo, da neha
         if self.mislec != None:
             self.mislec_stop = True
             self.mislec.join()
@@ -253,20 +249,9 @@ class Othello:
 
         #nariše črte na kanvas
         self.canvas.delete(ALL)
-        self.canvas.create_line(50,0,50,400)
-        self.canvas.create_line(100,0,100,400)
-        self.canvas.create_line(150,0,150,400)
-        self.canvas.create_line(200,0,200,400)
-        self.canvas.create_line(250,0,250,400)
-        self.canvas.create_line(300,0,300,400)
-        self.canvas.create_line(350,0,350,400)
-        self.canvas.create_line(0,50,400,50)
-        self.canvas.create_line(0,100,400,100)
-        self.canvas.create_line(0,150,400,150)
-        self.canvas.create_line(0,200,400,200)
-        self.canvas.create_line(0,250,400,250)
-        self.canvas.create_line(0,300,400,300)
-        self.canvas.create_line(0,350,400,350)
+        for i in range(8):
+            self.canvas.create_line(i*50,0,i*50,400)
+            self.canvas.create_line(0,i*50,400,i*50)
 
         #nariše začetne žetone
         self.canvas.create_oval(150+5, 150+5, 150+45, 150+45, fill="black")
@@ -316,8 +301,6 @@ class Othello:
                     # to naredimo z zamikom, da se lahko prejšnja poteza sploh nariše.
                     self.canvas.after(100, self.racunalnik_odigraj_potezo)
 
-
-###??????????????############
     def racunalnik_odigraj_potezo(self):
         '''Računalnik odigra naslednjo potezo.'''
         # Naredimo vzporedno vlakno
