@@ -6,7 +6,7 @@ Othelo (ali Reversi) je igra za dva igralca, ki se igra na 8x8 plošči s črnim
 
 * Repozitorij vsebuje igro Othello - projekt pri predmetu Programiranje 2 v šolskem letu 2014/2015. 
 * Cilj je ustvariti igro Othello, ki jo je možno igrati prek grafičnega vmesnika, in sicer človek proti človeku, človek proti računalniku, ali pa opazovati igro računalnik proti računalniku. Računalnik zna igrati z metodo alfa-beta.
-* Uporablja Python 3.4 in module Tkinter.
+* Uporablja se Python 3.4 in module Tkinter.
 
 ### Kaj repozitorij vsebuje? ###
 
