@@ -8,6 +8,13 @@ NEG_INFINITY = -POS_INFINITY
 BELI = "Beli"
 CRNI = "Črni"
 
+KOTI = [(0, 0), (0, 7), (7, 0), (7, 7)]
+SLABA_1 = [(1, 1), (1, 6), (6, 1), (6, 6)]
+SLABA_2 = [(1, 0), (6, 0), (1, 7), (6, 7), (0, 1), (0, 6), (7, 1), (7, 6)]
+DOBRA = [(2, 0), (5, 0), (2, 7), (5, 7), (0, 2), (0, 5), (7, 2), (7, 5)]
+V_REDU = [(3, 0), (4, 0), (3, 7), (4, 7), (0, 3), (0, 4), (7, 3), (7, 4)]
+OSTALE = [(i, j) for i in range(8) for j in range(8) if (i, j) not in KOTI+SLABA_1+SLABA_2+DOBRA+V_REDU]
+
 def drugi(igr):
     if igr == CRNI:
         return BELI
@@ -52,43 +59,42 @@ def seznam_sosedov(i, j) :
             return [[i-1, j],[i+1, j],[i-1,j+1],[i,j+1],[i+1,j+1],[i-1,j-1],[i,j-1],[i+1,j-1]]
 
 class Igra():
-  """Razred, ki predstavlja trenutno stanje igre."""
-  def __init__(self):
-    self.na_potezi = CRNI # kdo je na potezi
-    #število črnih/belih ploščic, ki so na polju
-    self.stejcrne = 2
-    self.stejbele = 2
-    #seznam, ki vsebuje elemente "None"(prazno polje), CRNI in BELI
-    self.polje = [[None for i in range(8)] for j in range(8)]
-    #začetne žetone doda v self.polje
-    self.polje[3][3] = CRNI
-    self.polje[4][4] = CRNI
-    self.polje[3][4] = BELI
-    self.polje[4][3] = BELI
-    self.prejsnja_stanja = []
+    """Razred, ki predstavlja trenutno stanje igre."""
+    def __init__(self):
+        self.na_potezi = CRNI # kdo je na potezi
+        #število črnih/belih ploščic, ki so na polju
+        self.stejcrne = 2
+        self.stejbele = 2
+        #seznam, ki vsebuje elemente "None"(prazno polje), CRNI in BELI
+        self.polje = [[None for i in range(8)] for j in range(8)]
+        #začetne žetone doda v self.polje
+        self.polje[3][3] = CRNI
+        self.polje[4][4] = CRNI
+        self.polje[3][4] = BELI
+        self.polje[4][3] = BELI
+        self.prejsnja_stanja = []
+        self.crna_vrednost = 0
+        self.bela_vrednost = 0
+        self.crni_seznam = [(0,KOTI), (0,SLABA_1), (0,SLABA_2), (0,DOBRA), (0,V_REDU), (0,OSTALE)]
+        self.beli_seznam = [(0,KOTI), (0,SLABA_1), (0,SLABA_2), (0,DOBRA), (0,V_REDU), (0,OSTALE)]
 
-  def __repr__(self):
-    s = ""
-    for j in range(8):
-      t = ""
-      for i in range(8):
-        c = self.polje[i][j]
-        if c == CRNI: t += " X "
-        elif c == BELI: t += " O "
-        else: t += " . "
-      s += t + "\n"
-    return ("\nNa potezi je {0}.\nbele = {1}, crne = {2}\nprejsnja_stanja = {3}\n{4}".format(
-      self.na_potezi, self.stejbele, self.stejcrne, len(self.prejsnja_stanja), s))
+    def __repr__(self):
+        s = ""
+        for j in range(8):
+            t = ""
+            for i in range(8):
+                c = self.polje[i][j]
+                if c == CRNI: t += " X "
+                elif c == BELI: t += " O "
+                else: t += " . "
+            s += t + "\n"
+        return ("\nNa potezi je {0}.\nbele = {1}, crne = {2}\nprejsnja_stanja = {3}\n{4}".format(
+              self.na_potezi, self.stejbele, self.stejcrne, len(self.prejsnja_stanja), s))
 
-  def konec(self):
-    '''Ugotovi, ali je konec igre. Vrne None (igre ni konec),
-       niz 'Neodločeno' (rezultat je neodločen), ali pa zmagovalca.'''
-    if self.stejcrne == 0:
-        return BELI
-    elif self.stejbele == 0:
-        return CRNI
-    else:
-        if self.stejcrne + self.stejbele == 64 or self.poteze(CRNI)==self.poteze(BELI)==[]:
+    def konec(self):
+        '''Ugotovi, ali je konec igre. Vrne None (igre ni konec),
+           niz 'Neodločeno' (rezultat je neodločen), ali pa zmagovalca.'''
+        if self.poteze(CRNI)==[] or self.poteze(BELI)==[]:
             if self.stejcrne > self.stejbele:
                 return CRNI
             elif self.stejbele >self.stejcrne:
@@ -98,51 +104,81 @@ class Igra():
         else:
             return None
 
-  def vrednost(self):
-    """Ocena za trenutno vrednost igre. Če je igre konec, mora biti ta ocena natančna,
-       sicer je to nek približek."""
-    if self.na_potezi == CRNI:
-      return self.stejcrne - self.stejbele
-    else:
-      return self.stejbele - self.stejcrne
 
-  def poteze(self, barva):
-    """Vrni seznam moznih potez v trenutni poziciji."""
-    sez_moznosti=[]
-    for j in range(len(self.polje)):
-        for i in range(len(self.polje[j])):
-            if self.polje[i][j] == None:
-                for (i1,j1) in seznam_sosedov(i, j):
-                    di = i1-i
-                    dj = j1-j
-                    if veljavna(barva, di, dj, self.polje, i, j) and (i,j) not in sez_moznosti:
-                        sez_moznosti.append((i,j))
-    return sez_moznosti
+    def vrednost(self):
+        """Ocena za trenutno vrednost igre. Če je igre konec, mora biti ta ocena natančna,
+           sicer je to nek približek."""
+        if self.konec()!= None:
+            if self.na_potezi == CRNI:
+                return self.stejcrne - self.stejbele
+            else:
+                return self.stejbele - self.stejcrne
 
-  def povleci(self, poteza, canvas = None, zetoni = None):
-    """Povleci potezo poteza, predpostaviti smemo, da je veljavna."""
-    # Preden potezo povlecemo, trenutno stanje spravimo
-    polje = [self.polje[i][:] for i in range(8)] # KOPIJA polja
-    self.prejsnja_stanja.append([self.na_potezi, self.stejcrne, self.stejbele, polje])
-    # naredimo potezo (skopiraš nekaj od spodaj)
-    (i,j) = poteza
-    self.polje[i][j] = self.na_potezi
-    # Popravimo stevec crnih in belih
-    if self.na_potezi == CRNI: self.stejcrne += 1
-    else: self.stejbele += 1
-    # ukleščeni žetoni spremenijo barvo
-    self.preobrni(i, j, canvas, zetoni)
-    # Zdaj je na potezi drugi (pozor, to ni nujno res v pravem Othellu)
-    self.na_potezi = drugi(self.na_potezi)
-    # print ("Trenutno stanje: {0}".format(self))
+        koti = 0
+        slabe_1 = 0
+        slabe_2 = 0
+        v_redu = 0
+        dobre = 0
+        
+        for i in range(8):
+            for j in range(8):
+                barva = self.polje[i][j]
+                if barva == self.na_potezi:
+                    if (i, j) in KOTI: koti += 1
+                    elif (i, j) in SLABA_1: slabe_1 -= 1
+                    elif (i, j) in SLABA_2: slabe_2 -= 1
+                    elif (i, j) in V_REDU: v_redu += 1
+                    elif (i, j) in DOBRA: dobre += 1
+                elif barva == drugi(self.na_potezi):
+                    if (i, j) in KOTI: koti -= 1
+                    elif (i, j) in SLABA_1: slabe_1 += 1
+                    elif (i, j) in SLABA_2: slabe_2 += 1
+                    elif (i, j) in V_REDU: v_redu -= 1
+                    elif (i, j) in DOBRA: dobre -= 1
+
+        poteze_igralca = len(self.poteze(self.na_potezi))
+        poteze_nasprotnika = len(self.poteze(drugi(self.na_potezi)))
+
+        mozne_poteze = poteze_igralca - poteze_nasprotnika
+        return (slabe_2 + v_redu) * 5 + (koti + slabe_1) * 1000 + dobre * 10
+
+    def poteze(self, barva):
+        """Vrni seznam moznih potez v trenutni poziciji."""
+        sez_moznosti=[]
+        for j in range(len(self.polje)):
+            for i in range(len(self.polje[j])):
+                if self.polje[i][j] == None:
+                    for (i1,j1) in seznam_sosedov(i, j):
+                        di = i1-i
+                        dj = j1-j
+                        if veljavna(barva, di, dj, self.polje, i, j) and (i,j) not in sez_moznosti:
+                            sez_moznosti.append((i,j))
+        return sez_moznosti
+
+    def povleci(self, poteza, canvas = None, zetoni = None):
+        """Povleci potezo poteza, predpostaviti smemo, da je veljavna."""
+        # Preden potezo povlecemo, trenutno stanje spravimo
+        polje = [self.polje[i][:] for i in range(8)] # KOPIJA polja
+        self.prejsnja_stanja.append([self.na_potezi, self.stejcrne, self.stejbele, polje])
+        # naredimo potezo (skopiraš nekaj od spodaj)
+        (i,j) = poteza
+        self.polje[i][j] = self.na_potezi
+        # Popravimo stevec crnih in belih
+        if self.na_potezi == CRNI: self.stejcrne += 1
+        else: self.stejbele += 1
+        # ukleščeni žetoni spremenijo barvo
+        self.preobrni(i, j, canvas, zetoni)
+        # Zdaj je na potezi drugi (pozor, to ni nujno res v pravem Othellu)
+        self.na_potezi = drugi(self.na_potezi)
+        # print ("Trenutno stanje: {0}".format(self))
 
 
 
-  def preobrni(self, i, j, canvas = None, zetoni = None):
-      """Spremeni barve nasprotnikovih žetonov, ki smo jih ukleščili med svoja žetona"""
-      barva = self.na_potezi
-      seznam = seznam_sosedov(i, j)
-      for (i1, j1) in seznam:
+    def preobrni(self, i, j, canvas = None, zetoni = None):
+        """Spremeni barve nasprotnikovih žetonov, ki smo jih ukleščili med svoja žetona"""
+        barva = self.na_potezi
+        seznam = seznam_sosedov(i, j)
+        for (i1, j1) in seznam:
           if self.polje[i1][j1] == drugi(barva):
               di = i1-i
               dj = j1-j
@@ -160,9 +196,9 @@ class Igra():
                           self.stejbele-=1
                       k += 1
 
-  def preklici(self, poteza):
-    """Preklici zandjo potezo."""
-    self.na_potezi, self.stejcrne, self.stejbele, self.polje = self.prejsnja_stanja.pop()
+    def preklici(self, poteza):
+        """Preklici zandjo potezo."""
+        self.na_potezi, self.stejcrne, self.stejbele, self.polje = self.prejsnja_stanja.pop()
 
 
 
@@ -211,6 +247,9 @@ class Othello:
         #seznam, ki vsebuje krogce(žetone) od tkinter
         self.zetoni = [[None for i in range(8)] for j in range(8)]
 
+        #seznam, ki vsebuje pike, ki označujejo možne poteze
+        #self.pike = [[None for i in range(8)] for j in range(8)]
+
         self.mislec = None  
         self.mislec_poteza = None
         self.mislec_stop = False
@@ -240,6 +279,9 @@ class Othello:
         #seznam, ki vsebuje krogce(žetone)
         self.zetoni = [[None for i in range(8)] for j in range(8)]
 
+        #seznam, ki vsebuje pike, ki označujejo možne poteze
+        #self.pike = [[None for i in range(8)] for j in range(8)]
+
         #nastavi, da začne črni
         self.napis.set("Na potezi je črni.")
 
@@ -252,7 +294,7 @@ class Othello:
         for i in range(8):
             self.canvas.create_line(i*50,0,i*50,400)
             self.canvas.create_line(0,i*50,400,i*50)
-
+        
         #nariše začetne žetone
         self.canvas.create_oval(150+5, 150+5, 150+45, 150+45, fill="black")
         self.canvas.create_oval(200+5, 200+5, 200+45, 200+45, fill="black")
@@ -264,6 +306,8 @@ class Othello:
         self.zetoni[4][3]=self.canvas.create_oval(200+5, 150+5, 200+45, 150+45, fill="white")
         self.zetoni[3][4]=self.canvas.create_oval(150+5, 200+5, 150+45, 200+45, fill="white")
 
+        #self.pomoc()
+        
         if self.crni == 'računalnik':
             self.racunalnik_odigraj_potezo()
 
@@ -313,8 +357,7 @@ class Othello:
         self.canvas.after(100, self.mislec_preveri_konec)
 
     def razmisljaj(self):
-        #(p, vrednost_p) = self.minimax(9)
-        self.mislec_poteza = Alphabeta(self.igra, True, globina = 5).igraj()
+        self.mislec_poteza = Alphabeta(self.igra, True, globina = 3).igraj()
         self.mislec = None # Pobrišemo objekt, ki predstavlja vlakno
 
     def mislec_preveri_konec(self):
@@ -332,7 +375,9 @@ class Othello:
             (self.igra.na_potezi == BELI and self.beli == "človek")):
             i = int(event.x / 50)
             j = int(event.y / 50)
+            #self.konec_pomoci()
             self.odigraj(i, j)
+
 
     def narisiCrnega(self, i, j):
         """Nariše črn žeton"""
@@ -347,6 +392,13 @@ class Othello:
         y = j * 50
         self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="white")
         self.zetoni[i][j] = self.canvas.create_oval(x+5, y+5, x+45, y+45, fill="white")
+
+##    def pomoc(self):
+##        if (self.igra.na_potezi == CRNI and self.crni == "človek") or (self.igra.na_potezi == BELI and self.beli == "človek"):
+##            for (i, j) in self.igra.poteze(self.igra.na_potezi):
+##                self.canvas.create_oval(i*50+20, j*50+20, i*50+25, j*50+25, fill="yellow")
+##                self.pike[i][j] = self.canvas.create_oval(i*50+20, j*50+20, i*50+25, j*50+25, fill="yellow")
+                
 
 
 master = Tk()
