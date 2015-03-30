@@ -44,7 +44,7 @@ class Alphabeta():
           p = None                  # Najboljša do sedaj videna poteza
           vrednost_p = NEG_INFINITY # Vrednost do sedaj najboljše videne poteze
           mozne_poteze = self.igra.poteze(self.igra.na_potezi)
-          
+          print(mozne_poteze, self.igra.na_potezi)
           random.shuffle(mozne_poteze)
           for poteza in mozne_poteze:
             self.igra.povleci(poteza)
