@@ -15,6 +15,12 @@ DOBRA = [(2, 0), (5, 0), (2, 7), (5, 7), (0, 2), (0, 5), (7, 2), (7, 5)]
 V_REDU = [(3, 0), (4, 0), (3, 7), (4, 7), (0, 3), (0, 4), (7, 3), (7, 4)]
 OSTALE = [(i, j) for i in range(8) for j in range(8) if (i, j) not in KOTI+SLABA_1+SLABA_2+DOBRA+V_REDU]
 
+HEVRISTIKA = [[20, -3, 11, 8, 8, 11, -3, 20],[-3, -7, -4, 1, 1, -4, -7, -3],
+              [11, -4, 2, 2, 2, 2, -4, 11],[8, 1, 2, 1, 1, 2, 1, 8],
+              [8, 1, 2, 1, 1, 2, 1, 8],[11, -4, 2, 2, 2, 2, -4, 11],
+              [-3, -7, -4, 1, 1, -4, -7, -3],[20, -3, 11, 8, 8, 11, -3, 20]]
+
+
 def drugi(igr):
     if igr == CRNI:
         return BELI
@@ -77,11 +83,11 @@ class Igra():
         self.polje[3][4] = BELI
         self.polje[4][3] = BELI
         self.prejsnja_stanja = []
-        self.crna_vrednost = 0
-        self.bela_vrednost = 0
-        self.crni_seznam = [(0,KOTI), (0,SLABA_1), (0,SLABA_2), (0,DOBRA), (0,V_REDU), (0,OSTALE)]
-        self.beli_seznam = [(0,KOTI), (0,SLABA_1), (0,SLABA_2), (0,DOBRA), (0,V_REDU), (0,OSTALE)]
-        self.skok = False
+        #self.crna_vrednost = 0
+        #self.bela_vrednost = 0
+        #self.crni_seznam = [(0,KOTI), (0,SLABA_1), (0,SLABA_2), (0,DOBRA), (0,V_REDU), (0,OSTALE)]
+        #self.beli_seznam = [(0,KOTI), (0,SLABA_1), (0,SLABA_2), (0,DOBRA), (0,V_REDU), (0,OSTALE)]
+        #self.skok = False
 
     def __repr__(self):
         s = ""
@@ -113,43 +119,23 @@ class Igra():
     def vrednost(self):
         """Ocena za trenutno vrednost igre. Če je igre konec, mora biti ta ocena natančna,
            sicer je to nek približek."""
-        #if self.konec()!= None:
-        if self.na_potezi == CRNI:
-            return self.stejcrne - self.stejbele
+        if self.konec()!= None:
+            if self.na_potezi == CRNI:
+                return self.stejcrne - self.stejbele
+            else:
+                return self.stejbele - self.stejcrne
         else:
-            return self.stejbele - self.stejcrne
+            if self.na_potezi == CRNI:
+                return self.vrednost_crnih - self.vrednost_belih
+            else:
+                return self.vrednost_belih - self.vrednost_crnih
 
-##        koti = 0
-##        slabe_1 = 0
-##        slabe_2 = 0
-##        v_redu = 0
-##        dobre = 0
-##        
-##        for i in range(8):
-##            for j in range(8):
-##                barva = self.polje[i][j]
-##                if barva == self.na_potezi:
-##                    if (i, j) in KOTI: koti += 1
-##                    elif (i, j) in SLABA_1: slabe_1 -= 1
-##                    elif (i, j) in SLABA_2: slabe_2 -= 1
-##                    elif (i, j) in V_REDU: v_redu += 1
-##                    elif (i, j) in DOBRA: dobre += 1
-##                elif barva == drugi(self.na_potezi):
-##                    if (i, j) in KOTI: koti -= 1
-##                    elif (i, j) in SLABA_1: slabe_1 += 1
-##                    elif (i, j) in SLABA_2: slabe_2 += 1
-##                    elif (i, j) in V_REDU: v_redu -= 1
-##                    elif (i, j) in DOBRA: dobre -= 1
-##
 ##        poteze_igralca = len(self.poteze(self.na_potezi))
 ##        poteze_nasprotnika = len(self.poteze(drugi(self.na_potezi)))
 ##
 ##        mozne_poteze = poteze_igralca - poteze_nasprotnika
-##        if self.na_potezi == CRNI:
-##            return self.vrednost_crnih - self.vrednost_belih
-##        else:
-##            return self.vrednost_belih - self.vrednost_crnih
-        #return mozne_poteze * 5 +(slabe_2 + v_redu) * 5 + (koti + slabe_1) * 1000 + dobre * 10
+
+
 
     def poteze(self, barva):
         """Vrni seznam moznih potez v trenutni poziciji."""
@@ -168,13 +154,14 @@ class Igra():
         """Povleci potezo poteza, predpostaviti smemo, da je veljavna."""
         # Preden potezo povlecemo, trenutno stanje spravimo
         polje = [self.polje[i][:] for i in range(8)] # KOPIJA polja
-        self.prejsnja_stanja.append([self.na_potezi, self.stejcrne, self.stejbele, polje])
+        self.prejsnja_stanja.append([self.na_potezi, self.stejcrne, self.stejbele, self.vrednost_crnih, self.vrednost_belih, polje])
         # naredimo potezo (skopiraš nekaj od spodaj)
         (i,j) = poteza
         self.polje[i][j] = self.na_potezi
         # Popravimo stevec crnih in belih
         if self.na_potezi == CRNI:
             self.stejcrne += 1
+            self.vrednost_crnih += HEVRISTIKA[i][j]
 ##            if (i, j) in KOTI: self.vrednost_crnih+=10
 ##            elif (i, j) in SLABA_1: self.vrednost_crnih-=10
 ##            elif (i, j) in SLABA_2: self.vrednost_crnih-=5
@@ -182,6 +169,7 @@ class Igra():
 ##            elif (i, j) in DOBRA: self.vrednost_crnih+=7
         else:
             self.stejbele += 1
+            self.vrednost_belih += HEVRISTIKA[i][j]
 ##            if (i, j) in KOTI: self.vrednost_belih+=10
 ##            elif (i, j) in SLABA_1: self.vrednost_belih-=10
 ##            elif (i, j) in SLABA_2: self.vrednost_belih-=5
@@ -191,7 +179,7 @@ class Igra():
         self.preobrni(i, j, canvas, zetoni)
         # Zdaj je na potezi drugi (pozor, to ni nujno res v pravem Othellu)
         self.na_potezi = drugi(self.na_potezi)
-        print(self.poteze(CRNI), self.poteze(BELI))
+        #print(self.poteze(CRNI), self.poteze(BELI))
         self.preskok()
         # print ("Trenutno stanje: {0}".format(self))
 
@@ -213,33 +201,19 @@ class Igra():
                           if canvas: canvas.itemconfig(zetoni[i+k*di][j+k*dj], fill="white")
                           self.stejcrne-=1
                           self.stejbele+=1
-##                          if (i, j) in SLABA_1: self.vrednost_belih-=10
-##                          elif (i, j) in SLABA_2: self.vrednost_belih-=5
-##                          elif (i, j) in V_REDU: self.vrednost_belih+=5
-##                          elif (i, j) in DOBRA: self.vrednost_belih+=7
-##
-##                          if (i, j) in SLABA_1: self.vrednost_crnih+=10
-##                          elif (i, j) in SLABA_2: self.vrednost_crnih+=5
-##                          elif (i, j) in V_REDU: self.vrednost_crnih-=5
-##                          elif (i, j) in DOBRA: self.vrednost_crnih-=7
+                          self.vrednost_belih += HEVRISTIKA[i+k*di][j+k*dj]
+                          self.vrednost_crnih -= 1
                       else:
                           if canvas: canvas.itemconfig(zetoni[i+k*di][j+k*dj], fill="black")
                           self.stejcrne+=1
                           self.stejbele-=1
-##                          if (i, j) in SLABA_1: self.vrednost_crnih-=10
-##                          elif (i, j) in SLABA_2: self.vrednost_crnih-=5
-##                          elif (i, j) in V_REDU: self.vrednost_crnih+=5
-##                          elif (i, j) in DOBRA: self.vrednost_crnih+=7
-##
-##                          if (i, j) in SLABA_1: self.vrednost_belih+=10
-##                          elif (i, j) in SLABA_2: self.vrednost_belih+=5
-##                          elif (i, j) in V_REDU: self.vrednost_belih-=5
-##                          elif (i, j) in DOBRA: self.vrednost_belih-=7
+                          self.vrednost_crnih += HEVRISTIKA[i+k*di][j+k*dj]
+                          self.vrednost_belih -= 1                          
                       k += 1
 
     def preklici(self, poteza):
         """Preklici zandjo potezo."""
-        self.na_potezi, self.stejcrne, self.stejbele, self.polje = self.prejsnja_stanja.pop()
+        self.na_potezi, self.stejcrne, self.stejbele, self.vrednost_crnih, self.vrednost_belih, self.polje = self.prejsnja_stanja.pop()
 
     def preskok(self):
         """Če igralec ne more storiti ničesar (nobena poteza ni veljavna), ga preskoči"""
@@ -317,8 +291,6 @@ class Othello:
     def zacni_igro(self, crni, beli):
         # Ustvari novo igro
         self.igra = Igra()
-
-        #self.se_igra = True
 
         #nariše polje in nastavi igro na začetek
         self.crni = crni
