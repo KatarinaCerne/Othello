@@ -3,12 +3,22 @@ import random
 POS_INFINITY = 100000000000
 NEG_INFINITY = -POS_INFINITY
 
+BELI = "Beli"
+CRNI = "Črni"
+
+def drugi(igr):
+    if igr == CRNI:
+        return BELI
+    else:
+        return CRNI
+
 class Alphabeta():
 
   def __init__(self, igra, igralec, globina = 5):
     self.igra = igra
     self.igralec = igralec # Ali je to igralec ali nasprotnik?
     self.globina = globina
+
 
   def igraj(self):
     self.pozicije = 0 # Štejemo, koliko pozicij smo pregledali
@@ -30,6 +40,7 @@ class Alphabeta():
           p = None                  # Najboljša do sedaj videna poteza
           vrednost_p = NEG_INFINITY # Vrednost do sedaj najboljše videne poteze
           mozne_poteze = self.igra.poteze(self.igra.na_potezi)
+          #print("i",self.igra.na_potezi,mozne_poteze)
           random.shuffle(mozne_poteze)
           for poteza in mozne_poteze:
             self.igra.povleci(poteza)
@@ -49,6 +60,7 @@ class Alphabeta():
           # Na potezi je nasprotnik, vrednost igre minimiziramo
           p = None                  # Najboljša do sedaj videna poteza
           vrednost_p = POS_INFINITY # Vrednost do sedaj najboljše videne poteze
+          #print("n",self.igra.na_potezi,self.igra.poteze(self.igra.na_potezi))
           for poteza in self.igra.poteze(self.igra.na_potezi):
             self.igra.povleci(poteza)
             (q, vrednost_q) = self.alphabeta(globina-1, alpha, beta, True)#tale True. poglej ga.
