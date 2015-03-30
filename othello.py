@@ -83,11 +83,6 @@ class Igra():
         self.polje[3][4] = BELI
         self.polje[4][3] = BELI
         self.prejsnja_stanja = []
-        #self.crna_vrednost = 0
-        #self.bela_vrednost = 0
-        #self.crni_seznam = [(0,KOTI), (0,SLABA_1), (0,SLABA_2), (0,DOBRA), (0,V_REDU), (0,OSTALE)]
-        #self.beli_seznam = [(0,KOTI), (0,SLABA_1), (0,SLABA_2), (0,DOBRA), (0,V_REDU), (0,OSTALE)]
-        #self.skok = False
 
     def __repr__(self):
         s = ""
@@ -105,7 +100,7 @@ class Igra():
     def konec(self):
         '''Ugotovi, ali je konec igre. Vrne None (igre ni konec),
            niz 'Neodločeno' (rezultat je neodločen), ali pa zmagovalca.'''
-        if self.poteze(CRNI)==[] or self.poteze(BELI)==[]:
+        if self.poteze(CRNI)==[] and self.poteze(BELI)==[]:
             if self.stejcrne > self.stejbele:
                 return CRNI
             elif self.stejbele >self.stejcrne:
@@ -125,16 +120,14 @@ class Igra():
             else:
                 return self.stejbele - self.stejcrne
         else:
+            poteze_igralca = len(self.poteze(self.na_potezi))
+            poteze_nasprotnika = len(self.poteze(drugi(self.na_potezi)))
+            mozne_poteze = poteze_igralca - poteze_nasprotnika
+            
             if self.na_potezi == CRNI:
-                return self.vrednost_crnih - self.vrednost_belih
+                return self.vrednost_crnih - self.vrednost_belih + mozne_poteze
             else:
-                return self.vrednost_belih - self.vrednost_crnih
-
-##        poteze_igralca = len(self.poteze(self.na_potezi))
-##        poteze_nasprotnika = len(self.poteze(drugi(self.na_potezi)))
-##
-##        mozne_poteze = poteze_igralca - poteze_nasprotnika
-
+                return self.vrednost_belih - self.vrednost_crnih + mozne_poteze
 
 
     def poteze(self, barva):
@@ -148,6 +141,9 @@ class Igra():
                         dj = j1-j
                         if veljavna(barva, di, dj, self.polje, i, j) and (i,j) not in sez_moznosti:
                             sez_moznosti.append((i,j))
+        if sez_moznosti ==[] and self.konec == None:
+            sez_moznosti = [None]
+        print(sez_moznosti, self.na_potezi)
         return sez_moznosti
 
     def povleci(self, poteza, canvas = None, zetoni = None):
@@ -158,28 +154,21 @@ class Igra():
         # naredimo potezo (skopiraš nekaj od spodaj)
         (i,j) = poteza
         self.polje[i][j] = self.na_potezi
+
         # Popravimo stevec crnih in belih
         if self.na_potezi == CRNI:
             self.stejcrne += 1
             self.vrednost_crnih += HEVRISTIKA[i][j]
-##            if (i, j) in KOTI: self.vrednost_crnih+=10
-##            elif (i, j) in SLABA_1: self.vrednost_crnih-=10
-##            elif (i, j) in SLABA_2: self.vrednost_crnih-=5
-##            elif (i, j) in V_REDU: self.vrednost_crnih+=5
-##            elif (i, j) in DOBRA: self.vrednost_crnih+=7
         else:
             self.stejbele += 1
             self.vrednost_belih += HEVRISTIKA[i][j]
-##            if (i, j) in KOTI: self.vrednost_belih+=10
-##            elif (i, j) in SLABA_1: self.vrednost_belih-=10
-##            elif (i, j) in SLABA_2: self.vrednost_belih-=5
-##            elif (i, j) in V_REDU: self.vrednost_belih+=5
-##            elif (i, j) in DOBRA: self.vrednost_belih+=7
         # ukleščeni žetoni spremenijo barvo
         self.preobrni(i, j, canvas, zetoni)
         # Zdaj je na potezi drugi (pozor, to ni nujno res v pravem Othellu)
         self.na_potezi = drugi(self.na_potezi)
         #print(self.poteze(CRNI), self.poteze(BELI))
+        #print("skačem")
+        #print(self.poteze(self.na_potezi))
         self.preskok()
         # print ("Trenutno stanje: {0}".format(self))
 
@@ -217,10 +206,11 @@ class Igra():
 
     def preskok(self):
         """Če igralec ne more storiti ničesar (nobena poteza ni veljavna), ga preskoči"""
-        if self.poteze(self.na_potezi) == []:
+        if self.poteze(self.na_potezi) == [None]:
             print("ni ok")
             self.na_potezi = drugi(self.na_potezi)
-            self.skok = True
+        else:
+            print("dobro")
             
 
 class Othello:
@@ -390,7 +380,7 @@ class Othello:
         self.canvas.after(100, self.mislec_preveri_konec)
 
     def razmisljaj(self):
-        self.mislec_poteza = Alphabeta(self.igra, True, globina = 4).igraj()
+        self.mislec_poteza = Alphabeta(self.igra, True, globina = 2).igraj()
         self.mislec = None # Pobrišemo objekt, ki predstavlja vlakno
 
     def mislec_preveri_konec(self):

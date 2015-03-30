@@ -34,13 +34,17 @@ class Alphabeta():
         vrednost = self.igra.vrednost()
         if not igralec: vrednost = -vrednost
         return (None, vrednost)
+    #elif self.igra.poteze(self.igra.na_potezi) == [] or self.igra.poteze(drugi(self.igra.na_potezi)) == []:
+        #igralec = not igralec
+        #print("i",self.igra.na_potezi,self.igra.poteze(self.igra.na_potezi))
+        #print("n",self.igra.na_potezi,self.igra.poteze(drugi(self.igra.na_potezi)))
     else:
         if igralec:
           # Na potezi je igralec, vrednost igre maksimiziramo
           p = None                  # Najboljša do sedaj videna poteza
           vrednost_p = NEG_INFINITY # Vrednost do sedaj najboljše videne poteze
           mozne_poteze = self.igra.poteze(self.igra.na_potezi)
-          #print("i",self.igra.na_potezi,mozne_poteze)
+          
           random.shuffle(mozne_poteze)
           for poteza in mozne_poteze:
             self.igra.povleci(poteza)
@@ -60,7 +64,7 @@ class Alphabeta():
           # Na potezi je nasprotnik, vrednost igre minimiziramo
           p = None                  # Najboljša do sedaj videna poteza
           vrednost_p = POS_INFINITY # Vrednost do sedaj najboljše videne poteze
-          #print("n",self.igra.na_potezi,self.igra.poteze(self.igra.na_potezi))
+          
           for poteza in self.igra.poteze(self.igra.na_potezi):
             self.igra.povleci(poteza)
             (q, vrednost_q) = self.alphabeta(globina-1, alpha, beta, True)#tale True. poglej ga.
