@@ -34,10 +34,6 @@ class Alphabeta():
         vrednost = self.igra.vrednost()
         if not igralec: vrednost = -vrednost
         return (None, vrednost)
-    #elif self.igra.poteze(self.igra.na_potezi) == [] or self.igra.poteze(drugi(self.igra.na_potezi)) == []:
-        #igralec = not igralec
-        #print("i",self.igra.na_potezi,self.igra.poteze(self.igra.na_potezi))
-        #print("n",self.igra.na_potezi,self.igra.poteze(drugi(self.igra.na_potezi)))
     else:
         if igralec:
           # Na potezi je igralec, vrednost igre maksimiziramo

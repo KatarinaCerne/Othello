@@ -373,7 +373,6 @@ class Othello:
                 self.napis.set("Neodločeno")
             elif r == "Ne!":
                 self.igra.na_potezi = drugi(self.igra.na_potezi)
-                print(self.igra.na_potezi)
                 self.napis.set("Igre ni mogoče končati.")
             elif r is not None:
                 self.napis.set('Zmagal je ' + r)
