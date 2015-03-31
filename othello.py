@@ -77,6 +77,7 @@ class Igra():
 
         self.crni = 'človek' #kdo je črni
         self.beli = 'človek' #kdo je beli
+        
 
         self.slovar = {CRNI:self.crni, BELI:self.beli}
         
@@ -105,9 +106,9 @@ class Igra():
     def konec(self):
         '''Ugotovi, ali je konec igre. Vrne None (igre ni konec),
            niz 'Neodločeno' (rezultat je neodločen), ali pa zmagovalca.'''
-        if self.slovar[self.na_potezi]=="računalnik" or self.slovar[drugi(self.na_potezi)]=="računalnik":
-            if self.poteze(CRNI)==[] or self.poteze(BELI)==[]:
-                return "Ne!"
+##        if self.slovar[self.na_potezi]=="računalnik" or self.slovar[drugi(self.na_potezi)]=="računalnik":
+##            if self.poteze(CRNI)==[] or self.poteze(BELI)==[]:
+##                return "Ne!"
         if self.poteze(CRNI)==[] and self.poteze(BELI)==[]:
             if self.stejcrne > self.stejbele:
                 return CRNI
@@ -120,10 +121,10 @@ class Igra():
 
 
     def vrednost(self):
-            poteze_igralca = len(self.poteze(self.na_potezi))
-            poteze_nasprotnika = len(self.poteze(drugi(self.na_potezi)))
-            mozne_poteze = poteze_igralca - poteze_nasprotnika
-            return mozne_poteze
+        poteze_igralca = len(self.poteze(self.na_potezi))
+        poteze_nasprotnika = len(self.poteze(drugi(self.na_potezi)))
+        mozne_poteze = poteze_igralca - poteze_nasprotnika
+        return  poteze_igralca
     
 ##    def vrednost(self):
 ##        """Ocena za trenutno vrednost igre. Če je igre konec, mora biti ta ocena natančna,
@@ -220,10 +221,9 @@ class Igra():
 
     def preskok(self):
         """Če igralec ne more storiti ničesar (nobena poteza ni veljavna), ga preskoči"""
-        if self.slovar[self.na_potezi]=="človek" and self.slovar[drugi(self.na_potezi)]=="človek":
-            if self.poteze(self.na_potezi) == []:
-                print("ni ok")
-                self.na_potezi = drugi(self.na_potezi)
+        if self.poteze(self.na_potezi) == []:                
+            print("ni ok")
+            self.na_potezi = drugi(self.na_potezi)
             
 
 class Othello:
@@ -396,7 +396,7 @@ class Othello:
         self.canvas.after(100, self.mislec_preveri_konec)
 
     def razmisljaj(self):
-        self.mislec_poteza = Alphabeta(self.igra, True, globina = 4).igraj()
+        self.mislec_poteza = Alphabeta(self.igra, True, globina = 3).igraj()
         self.mislec = None # Pobrišemo objekt, ki predstavlja vlakno
 
     def mislec_preveri_konec(self):
@@ -410,8 +410,8 @@ class Othello:
 
     def klik(self, event):
         """Ko klikneš, se odigra poteza"""
-        if ((self.igra.na_potezi == CRNI and self.crni == "človek") or
-            (self.igra.na_potezi == BELI and self.beli == "človek")):
+        if ((self.igra.na_potezi == CRNI and self.igra.crni == "človek") or
+            (self.igra.na_potezi == BELI and self.igra.beli == "človek")):
             i = int(event.x / 50)
             j = int(event.y / 50)
             #self.konec_pomoci()
