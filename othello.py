@@ -233,15 +233,19 @@ class Othello:
 
         meni1 = Menu(menu)
         menu.add_cascade(label="Igra", menu=meni1)
-        meni1.add_command(label="Črni=Človek, Beli=Človek", command=lambda: self.zacni_igro("človek", "človek"))
-        meni1.add_command(label="Črni=Človek, Beli=Računalnik", command=lambda: self.zacni_igro("človek", "računalnik"))
-        meni1.add_command(label="Črni=Računalnik, Beli=Človek", command=lambda: self.zacni_igro("računalnik", "človek"))
-        meni1.add_command(label="Črni=Računalnik, Beli=Računalnik", command=lambda: self.zacni_igro("računalnik", "računalnik"))
+        meni1.add_command(label="Črni=Človek, Beli=Človek", command=lambda: self.zacni_igro("človek", "človek", None))
+        meni1.add_command(label="Črni=Človek, Beli=Računalnik - lahka", command=lambda: self.zacni_igro("človek", "računalnik", 2))
+        meni1.add_command(label="Črni=Človek, Beli=Računalnik - srednja", command=lambda: self.zacni_igro("človek", "računalnik", 3))
+        meni1.add_command(label="Črni=Človek, Beli=Računalnik - težja", command=lambda: self.zacni_igro("človek", "računalnik", 4))
+        meni1.add_command(label="Črni=Računalnik, Beli=Človek - lahka", command=lambda: self.zacni_igro("računalnik", "človek", 2))
+        meni1.add_command(label="Črni=Računalnik, Beli=Človek - srednja", command=lambda: self.zacni_igro("računalnik", "človek", 3))
+        meni1.add_command(label="Črni=Računalnik, Beli=Človek - težja", command=lambda: self.zacni_igro("računalnik", "človek", 4))
+        meni1.add_command(label="Črni=Računalnik, Beli=Računalnik", command=lambda: self.zacni_igro("računalnik", "računalnik", 4))
 
         meni2 = Menu(menu)
         menu.add_cascade(label="Navodila", menu=meni2)
-        meni2.add_command(label="Pravila igre", command=self.narisi_toplevel)
-
+        meni2.add_command(label="Pravila igre", command=self.narisi_toplevel)      
+        
         meni3 = Menu(menu)
         menu.add_cascade(label="Izhod", menu=meni3)
         meni3.add_command(label="Izhod iz igre", command=self.zapri)
@@ -269,11 +273,13 @@ class Othello:
         #seznam, ki vsebuje pike, ki označujejo možne poteze
         self.pike = [[None for i in range(8)] for j in range(8)]
 
+        self.globina = None
+
         self.mislec = None  
         self.mislec_poteza = None
         self.mislec_stop = False
 
-        self.zacni_igro('človek', 'človek')
+        self.zacni_igro('človek', 'človek', None)
 
     def narisi_toplevel(self):
         """Ustvari novo okno, ki se odpre, ko v meniju izberemo možnost 'Navodila'"""
@@ -302,9 +308,11 @@ class Othello:
             self.mislec.join()
         self.canvas.master.destroy()
 
-    def zacni_igro(self, crni, beli):
+    def zacni_igro(self, crni, beli, globina):
         # Ustvari novo igro
         self.igra = Igra()
+
+        self.globina = globina
 
         self.igra.crni = crni #kdo je črni
         self.igra.beli = beli #kdo je beli
@@ -422,7 +430,7 @@ class Othello:
 
     def razmisljaj(self):
         """Za računalnikovo potezo nastavi potezo, ki jo je predlagala 'alphabeta'"""
-        self.mislec_poteza = Alphabeta(self.igra, True, globina = 4).igraj()
+        self.mislec_poteza = Alphabeta(self.igra, True, globina = self.globina).igraj()
         self.mislec = None # Pobrišemo objekt, ki predstavlja vlakno
 
     def mislec_preveri_konec(self):
