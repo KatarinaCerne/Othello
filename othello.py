@@ -22,20 +22,15 @@ navodila = ["Othello ali reversi je strateška igra na igralni deski z 8 × 8 po
             "Namig:\n\n", "Žetona, ki je postavljen v kot igralne deske, nasprotni igralec ne more ujeti oz. mu spremeniti barvo.",
             "Zato je priporočljivo zasesti čimveč kotov.", "Dobre so tudi pozicije ob robovih."]
   
-        
-            
 
-##KOTI = [(0, 0), (0, 7), (7, 0), (7, 7)]
-##SLABA_1 = [(1, 1), (1, 6), (6, 1), (6, 6)]
-##SLABA_2 = [(1, 0), (6, 0), (1, 7), (6, 7), (0, 1), (0, 6), (7, 1), (7, 6)]
-##DOBRA = [(2, 0), (5, 0), (2, 7), (5, 7), (0, 2), (0, 5), (7, 2), (7, 5)]
-##V_REDU = [(3, 0), (4, 0), (3, 7), (4, 7), (0, 3), (0, 4), (7, 3), (7, 4)]
-##OSTALE = [(i, j) for i in range(8) for j in range(8) if (i, j) not in KOTI+SLABA_1+SLABA_2+DOBRA+V_REDU]
-
-HEVRISTIKA = [[20, -3, 11, 8, 8, 11, -3, 20],[-3, -7, -4, 1, 1, -4, -7, -3],
-              [11, -4, 2, 2, 2, 2, -4, 11],[8, 1, 2, 1, 1, 2, 1, 8],
-              [8, 1, 2, 1, 1, 2, 1, 8],[11, -4, 2, 2, 2, 2, -4, 11],
-              [-3, -7, -4, 1, 1, -4, -7, -3],[20, -3, 11, 8, 8, 11, -3, 20]]
+HEVRISTIKA = [[20, -3, 11, 8, 8, 11, -3, 20],
+              [-3, -7, -4, 1, 1, -4, -7, -3],
+              [11, -4, 2, 2, 2, 2, -4, 11],
+              [8, 1, 2, 1, 1, 2, 1, 8],
+              [8, 1, 2, 1, 1, 2, 1, 8],
+              [11, -4, 2, 2, 2, 2, -4, 11],
+              [-3, -7, -4, 1, 1, -4, -7, -3],
+              [20, -3, 11, 8, 8, 11, -3, 20]]
 
 
 def drugi(igr):
@@ -126,7 +121,7 @@ class Igra():
         '''Ugotovi, ali je konec igre. Vrne None (igre ni konec),
            niz 'Neodločeno' (rezultat je neodločen), ali pa zmagovalca.'''
 
-        if self.odvisne_poteze(CRNI)== self.odvisne_poteze(BELI)==[] or self.pass_poteze >= 2:
+        if self.poteze(CRNI)== self.poteze(BELI)==[] or self.pass_poteze >= 2 or self.stejbele+self.stejcrne == 64:
             if self.stejcrne > self.stejbele:
                 return CRNI
             elif self.stejbele >self.stejcrne:
@@ -135,38 +130,30 @@ class Igra():
                 return "Neodločeno"
         else:
             return None
-
-##    def vrednost(self):
-##        if self.poteze()!=["pass"]:
-##            poteze_igralca = len(self.poteze())
-##        else:
-##            poteze_igralca = 0
-##        if self.poteze()!=["pass"]:
-##            poteze_nasprotnika = len(self.poteze()))
-##        else:
-##            poteze_nasprotnika = 0
-##        mozne_poteze = poteze_igralca - poteze_nasprotnika
-##        return  poteze_igralca
     
     def vrednost(self):
         """Ocena za trenutno vrednost igre. Če je igre konec, mora biti ta ocena natančna,
            sicer je to nek približek."""
         if self.konec()!= None:
             if self.na_potezi == CRNI:
-                return self.stejcrne - self.stejbele
+                return self.stejcrne - self.stejbele 
             else:
                 return self.stejbele - self.stejcrne
-        #else:
-##            poteze_igralca = len(self.poteze(self.na_potezi))
-##            poteze_nasprotnika = len(self.poteze(drugi(self.na_potezi)))
-##            mozne_poteze = poteze_igralca - poteze_nasprotnika
+            
+        poteze_crnega = len(self.poteze(CRNI))
+        poteze_belega = len(self.poteze(BELI))
+        if self.poteze(CRNI) == ["pass"]:
+            poteze_crnega = 0
+        elif self.poteze(BELI) == ["pass"]:
+            poteze_belega = 0
             
         if self.na_potezi == CRNI:
-            return self.vrednost_crnih - self.vrednost_belih
+            return self.vrednost_crnih - self.vrednost_belih + poteze_crnega - poteze_belega
         else:
-            return self.vrednost_belih - self.vrednost_crnih
+            return self.vrednost_belih - self.vrednost_crnih + poteze_belega - poteze_crnega
         
-    def odvisne_poteze(self,barva):
+
+    def poteze(self, barva):
         """Vrni seznam moznih potez v trenutni poziciji."""
         sez_moznosti=[]
         for j in range(len(self.polje)):
@@ -176,19 +163,6 @@ class Igra():
                         di = i1-i
                         dj = j1-j
                         if veljavna(barva, di, dj, self.polje, i, j) and (i,j) not in sez_moznosti:
-                            sez_moznosti.append((i,j))
-        return sez_moznosti
-
-    def poteze(self):
-        """Vrni seznam moznih potez v trenutni poziciji."""
-        sez_moznosti=[]
-        for j in range(len(self.polje)):
-            for i in range(len(self.polje[j])):
-                if self.polje[i][j] == None:
-                    for (i1,j1) in seznam_sosedov(i, j):
-                        di = i1-i
-                        dj = j1-j
-                        if veljavna(self.na_potezi, di, dj, self.polje, i, j) and (i,j) not in sez_moznosti:
                             sez_moznosti.append((i,j))
         if sez_moznosti ==[]:
             sez_moznosti =["pass"]
@@ -201,7 +175,6 @@ class Igra():
         self.prejsnja_stanja.append([self.na_potezi, self.stejcrne, self.stejbele, self.vrednost_crnih, self.vrednost_belih, polje, self.pass_poteze])
         # naredimo potezo
         if poteza == "pass":
-            #print(self.na_potezi + " nima poteze")
             self.na_potezi = drugi(self.na_potezi)
             self.pass_poteze +=1
         else:
@@ -220,10 +193,8 @@ class Igra():
             self.preobrni(i, j, canvas, zetoni)
             # Zdaj je na potezi drugi (pozor, to ni nujno res v pravem Othellu)
             self.na_potezi = drugi(self.na_potezi)
-            #self.preskok()
+            self.preskok()
         #print ("Trenutno stanje: {0}".format(self))
-            #NA TEM MESTU BI SE MORAL ZGODITI NEKAKŠEN PRESKOK (ČE IGRALEC NIMA POTEZE, SE GA PRESKOČI TUDI V IGRI
-            #(NE SAMO V ALPHABETA) AMPAK KAJ SE BO DOGAJALO V ALPHABETA, ČE BO NA TEM MESTU FUNKCIJA ZA PRESKOK??
 
     def preobrni(self, i, j, canvas = None, zetoni = None):
         """Spremeni barve nasprotnikovih žetonov, ki smo jih ukleščili med svoja žetona"""
@@ -257,9 +228,9 @@ class Igra():
 
     def preskok(self):
         """Če igralec ne more storiti ničesar (nobena poteza ni veljavna), ga preskoči"""
-        if self.slovar(self.na_potezi) == "človek":
-            if self.odvisne_poteze(self.na_potezi) == []:                
-                print("zgodil se je preskok----------------------------------------------------------------------------------------------")
+        if self.slovar[self.na_potezi] == "človek":
+            if self.poteze(self.na_potezi) == ["pass"]:                
+                #print("zgodil se je preskok----------------------------------------------------------------------------------------------")
                 self.na_potezi = drugi(self.na_potezi)            
 
 class Othello:
@@ -280,20 +251,15 @@ class Othello:
         meni1.add_command(label="Črni=Računalnik, Beli=Računalnik", command=lambda: self.zacni_igro("računalnik", "računalnik"))
 
         meni2 = Menu(menu)
-        menu.add_cascade(label="Izhod", menu=meni2)
-        meni2.add_command(label="Izhod iz igre", command=self.zapri)
+        menu.add_cascade(label="Navodila", menu=meni2)
+        meni2.add_command(label="Pravila igre", command=self.narisi_toplevel)
 
         meni3 = Menu(menu)
-        menu.add_cascade(label="Navodila", menu=meni3)
-        meni3.add_command(label="Pravila igre", command=self.narisi_toplevel)
+        menu.add_cascade(label="Izhod", menu=meni3)
+        meni3.add_command(label="Izhod iz igre", command=self.zapri)
         ######
 
         self.igra = None # Igre ne igramo trenutno
-        
-        #self.crni = 'človek' #kdo je črni
-        #self.beli = 'človek' #kdo je beli
-
-        #self.slovar = {CRNI:self.crni, BELI:self.beli}
 
         #napis, ki pove, kdo je na vrsti
         self.napis = StringVar(master, value="Začnimo.")
@@ -396,7 +362,7 @@ class Othello:
             
     def odigraj(self, poteza):
         """Če je polje prazno in poteza veljavna, se poteza odigra."""
-        print(self.igra.na_potezi, "povlekel potezo ", poteza)
+        #print(self.igra.na_potezi, "povlekel potezo ", poteza)
         if poteza == "pass":
             self.igra.povleci(poteza, canvas=self.canvas, zetoni=self.zetoni)
             
@@ -435,9 +401,6 @@ class Othello:
         if r == "Neodločeno":
             self.igra.na_potezi = None
             self.napis.set("Neodločeno")
-        elif r == "Ne!":
-            self.igra.na_potezi = drugi(self.igra.na_potezi)
-            self.napis.set("Igre ni mogoče končati.")
         elif r is not None:
             self.napis.set('Zmagal je ' + r)
         else:
@@ -460,7 +423,7 @@ class Othello:
         self.canvas.after(100, self.mislec_preveri_konec)
 
     def razmisljaj(self):
-        self.mislec_poteza = Alphabeta(self.igra, True, globina = 2).igraj()
+        self.mislec_poteza = Alphabeta(self.igra, True, globina = 4).igraj()
         self.mislec = None # Pobrišemo objekt, ki predstavlja vlakno
 
     def mislec_preveri_konec(self):
@@ -497,9 +460,13 @@ class Othello:
 
     def pomoc(self):
         if (self.igra.na_potezi == CRNI and self.igra.crni == "človek") or (self.igra.na_potezi == BELI and self.igra.beli == "človek"):
-            for (i, j) in self.igra.odvisne_poteze(self.igra.na_potezi):
-                pika = self.canvas.create_oval(i*50+20, j*50+20, i*50+25, j*50+25, fill="green")
-                self.pike[i][j] = pika
+            for poteza in self.igra.poteze(self.igra.na_potezi):
+                if poteza == "pass":
+                    pass
+                else:
+                    i,j=poteza[0],poteza[1]
+                    pika = self.canvas.create_oval(i*50+20, j*50+20, i*50+25, j*50+25, fill="green")
+                    self.pike[i][j] = pika
                 
     def konec_pomoci(self):
         for podseznam in self.pike:
