@@ -14,6 +14,7 @@ class Alphabeta():
         #print("na potezi je " + self.igra.na_potezi + "njegove poteze: " ,self.igra.poteze())
         # Izpišemo statistike
         #print ("\nAlphabeta: globina {0}, stevilo pozicij {1}, vrednost igre {2}\n".format(self.globina, self.pozicije, vrednost_p))
+        print(p)
         return p
 
     def alphabeta(self, globina, alpha, beta, igralec):
