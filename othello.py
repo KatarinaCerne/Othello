@@ -7,22 +7,7 @@ NEG_INFINITY = -POS_INFINITY
 
 BELI = "Beli"
 CRNI = "Črni"
-
-navodila = ["Othello ali reversi je strateška igra na igralni deski z 8 × 8 polji, kot pri šahovnici ",
-            "za dva igralca. Igralca potrebujeta za igro črne in bele figure.\n\n", "Pravila igre:\n\n",
-            "Na začetku ima vsak izmed igralcev na plošči dva žetona. ", "Igralca nato izmenično polagata žetone na ploščo. ",
-            "Pri vsaki potezi mora biti žeton postavljen poleg nasprotnikovega žetona (lahko vodoravno, navpično ali diagonalno). ",
-            "Položeni žeton mora v vsaki potezi ujeti enega ali več nasprotnikovih žetonov med enega ali več svojih žetonov, ",
-            "ki so položeni v katerikoli smeri od pravkar položenega. ",
-            "Ujetim nasprotnikovim žetonom igralec tako spremeni barvo. ",
-            "Če igralec, ki pride na potezo, ne more storiti ničesar (t.j. ne more ujeti nasprotnikovih žetonov med dva svoja), ",
-            "mora prepustiti potezo nasprotniku. " "Igralca nadaljujeta s postopkom igranja, dokler ne zapolnita vseh polj, ",
-            "ali dokler se ne zgodi, da nobeden izmed njiju ne more narediti veljavne poteze.\n\n",
-            "Za pomoč so v aplikaciji polja, kamor je možno postaviti žeton, označena z zeleno piko.\n\n",
-            "Namig:\n\n", "Žetona, ki je postavljen v kot igralne deske, nasprotni igralec ne more ujeti oz. mu spremeniti barvo.",
-            "Zato je priporočljivo zasesti čimveč kotov.", "Dobre so tudi pozicije ob robovih."]
   
-
 HEVRISTIKA = [[20, -3, 11, 8, 8, 11, -3, 20],
               [-3, -7, -4, 1, 1, -4, -7, -3],
               [11, -4, 2, 2, 2, 2, -4, 11],
@@ -31,7 +16,6 @@ HEVRISTIKA = [[20, -3, 11, 8, 8, 11, -3, 20],
               [11, -4, 2, 2, 2, 2, -4, 11],
               [-3, -7, -4, 1, 1, -4, -7, -3],
               [20, -3, 11, 8, 8, 11, -3, 20]]
-
 
 def drugi(igr):
     if igr == CRNI:
@@ -296,14 +280,14 @@ class Othello:
         toplevel = Toplevel(master, width=40, height=40, takefocus = True)
         toplevel.title("Pravila igre")
         toplevel.resizable(width=False, height=False) #preprečimo spreminjanje velikosti okna
-        navodilo = ""
-        for element in navodila:
-            navodilo+=element #posamezne elemente iz seznama "navodila" združimo v en niz
-        izpis = Text(toplevel) #tekst znotraj okna "toplevel"
-        izpis.insert(INSERT,navodilo)
-        izpis.grid(row=0, column=0, columnspan=2, sticky = W)
-        izpis.config(wrap=WORD) #poskrbimo, da ne prelomi besed, ki morajo v novo vrstico
-        izpis.config(state=DISABLED) #preprečimo spreminjanje teksta
+
+        textFile = open("navodila.txt", 'r')
+        textString = textFile.read()
+        text = Text(toplevel) #tekst znotraj okna "toplevel"
+        text.grid(row=0, column=0, columnspan=2, sticky = W)
+        text.insert(END, textString)
+        text.config(wrap=WORD) #poskrbimo, da ne prelomi besed, ki morajo v novo vrstico
+        text.config(state=DISABLED) #preprečimo spreminjanje teksta
             
     def zapri(self):
         """Zapre igro"""

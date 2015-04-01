@@ -1,0 +1,14 @@
+Othello ali reversi je strateška igra na igralni deski z 8 × 8 polji, kot pri šahovnici za dva igralca. Igralca potrebujeta za igro èrne in bele figure.
+
+Pravila igre:
+
+Na zaèetku ima vsak izmed igralcev na plošèi dva žetona. Igralca nato izmenièno polagata žetone na plošèo. Pri vsaki potezi mora biti žeton postavljen poleg nasprotnikovega žetona (lahko vodoravno, navpièno ali diagonalno). Položeni žeton mora v vsaki potezi ujeti enega ali veè nasprotnikovih žetonov med enega ali veè svojih žetonov, ki so položeni v katerikoli smeri od pravkar položenega. Ujetim nasprotnikovim žetonom igralec tako spremeni barvo. Èe igralec, ki pride na potezo, ne more storiti nièesar (t.j. ne more ujeti nasprotnikovih žetonov med dva svoja), mora prepustiti potezo nasprotniku. Igralca nadaljujeta s postopkom igranja, dokler ne zapolnita vseh polj, ali dokler se ne zgodi, da nobeden izmed njiju ne more narediti veljavne poteze.
+
+
+Za pomoè so v aplikaciji polja, kamor je možno postaviti žeton, oznaèena z zeleno piko.
+
+
+Namig:
+
+Žetona, ki je postavljen v kot igralne deske, nasprotni igralec ne more ujeti oz. mu spremeniti barvo. Zato je priporoèljivo zasesti èimveè kotov. Dobre so tudi pozicije ob robovih igralne plošèe.
+
