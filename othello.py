@@ -277,18 +277,24 @@ class Othello:
 
     def narisi_toplevel(self):
         """Ustvari novo okno, ki se odpre, ko v meniju izberemo možnost 'Navodila'"""
-        toplevel = Toplevel(master, width=40, height=40, takefocus = True)
+        toplevel = Toplevel(master, width=100, height=100, takefocus = True)
         toplevel.title("Pravila igre")
         toplevel.resizable(width=False, height=False) #preprečimo spreminjanje velikosti okna
-
+        
         textFile = open("navodila.txt", 'r')
-        textString = textFile.read()
+        textNavodila = textFile.read()
         text = Text(toplevel) #tekst znotraj okna "toplevel"
-        text.grid(row=0, column=0, columnspan=2, sticky = W)
-        text.insert(END, textString)
+
+        scrollbar = Scrollbar(toplevel)
+        scrollbar.config(command=text.yview)
+        text.config(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side="right", fill="y", expand=False)
+        text.pack(side="left", fill="both", expand=True)
+
+        text.insert(END, textNavodila)
         text.config(wrap=WORD) #poskrbimo, da ne prelomi besed, ki morajo v novo vrstico
         text.config(state=DISABLED) #preprečimo spreminjanje teksta
-            
+     
     def zapri(self):
         """Zapre igro"""
         if self.mislec != None:
