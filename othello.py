@@ -8,6 +8,23 @@ NEG_INFINITY = -POS_INFINITY
 BELI = "Beli"
 CRNI = "Črni"
 
+navodila = ["Othello ali reversi je strateška igra na igralni deski z 8 × 8 polji, kot pri šahovnici ",
+            "za dva igralca. Igralca potrebujeta za igro črne in bele figure.\n\n", "Pravila igre:\n\n",
+            "Na začetku ima vsak izmed igralcev na plošči dva žetona. ", "Igralca nato izmenično polagata žetone na ploščo. ",
+            "Pri vsaki potezi mora biti žeton postavljen poleg nasprotnikovega žetona (lahko vodoravno, navpično ali diagonalno). ",
+            "Položeni žeton mora v vsaki potezi ujeti enega ali več nasprotnikovih žetonov med enega ali več svojih žetonov, ",
+            "ki so položeni v katerikoli smeri od pravkar položenega. ",
+            "Ujetim nasprotnikovim žetonom igralec tako spremeni barvo. ",
+            "Če igralec, ki pride na potezo, ne more storiti ničesar (t.j. ne more ujeti nasprotnikovih žetonov med dva svoja), ",
+            "mora prepustiti potezo nasprotniku. " "Igralca nadaljujeta s postopkom igranja, dokler ne zapolnita vseh polj, ",
+            "ali dokler se ne zgodi, da nobeden izmed njiju ne more narediti veljavne poteze.\n\n",
+            "Za pomoč so v aplikaciji polja, kamor je možno postaviti žeton, označena z zeleno piko.\n\n",
+            "Namig:\n\n", "Žetona, ki je postavljen v kot igralne deske, nasprotni igralec ne more ujeti oz. mu spremeniti barvo.",
+            "Zato je priporočljivo zasesti čimveč kotov.", "Dobre so tudi pozicije ob robovih."]
+  
+        
+            
+
 ##KOTI = [(0, 0), (0, 7), (7, 0), (7, 7)]
 ##SLABA_1 = [(1, 1), (1, 6), (6, 1), (6, 6)]
 ##SLABA_2 = [(1, 0), (6, 0), (1, 7), (6, 7), (0, 1), (0, 6), (7, 1), (7, 6)]
@@ -193,9 +210,7 @@ class Igra():
         else:
             (i,j) = poteza
             self.polje[i][j] = self.na_potezi
-            if self.pass_poteze >0:
-                #print(self.pass_poteze)
-                self.pass_poteze -=1           
+            self.pass_poteze = 0           
         
             # Popravimo stevec crnih in belih
             if self.na_potezi == CRNI:
@@ -270,6 +285,10 @@ class Othello:
         meni2 = Menu(menu)
         menu.add_cascade(label="Izhod", menu=meni2)
         meni2.add_command(label="Izhod iz igre", command=self.zapri)
+
+        meni3 = Menu(menu)
+        menu.add_cascade(label="Navodila", menu=meni3)
+        meni3.add_command(label="Pravila igre", command=self.narisi_toplevel)
         ######
 
         self.igra = None # Igre ne igramo trenutno
@@ -306,6 +325,19 @@ class Othello:
 
         self.zacni_igro('človek', 'človek')
 
+    def narisi_toplevel(self):
+        toplevel = Toplevel(master, width=40, height=40, takefocus = True)
+        toplevel.title("Pravila igre")
+        toplevel.resizable(width=False, height=False)
+        navodilo = ""
+        for element in navodila:
+            navodilo+=element
+        izpis = Text(toplevel)
+        izpis.insert(INSERT,navodilo)
+        izpis.grid(row=0, column=0, columnspan=2, sticky = W)
+        izpis.config(wrap=WORD)
+        izpis.config(state=DISABLED)
+            
     def zapri(self):
         """Zapre igro"""
         if self.mislec != None:
@@ -374,6 +406,9 @@ class Othello:
                 self.napis.set("Na potezi je " + self.igra.na_potezi)
             else:
                 self.napis.set(self.igra.na_potezi + " razmišlja. Ne bodite nestrpni!")
+                
+            self.pomoc()
+            
         else:
             i,j=poteza[0],poteza[1]
             je_veljavna = False
@@ -395,7 +430,9 @@ class Othello:
 
                 self.napiscrni.set("Črni: "+str(self.igra.stejcrne))
                 self.napisbeli.set("Beli: "+str(self.igra.stejbele))
-
+                
+                self.pomoc()
+                
                 r = self.igra.konec()
                 if r == "Neodločeno":
                     self.igra.na_potezi = None
@@ -445,8 +482,6 @@ class Othello:
             j = int(event.y / 50)
             self.konec_pomoci()
             self.odigraj((i, j))
-            self.pomoc()
-
 
     def narisiCrnega(self, i, j):
         """Nariše črn žeton"""
@@ -465,9 +500,8 @@ class Othello:
     def pomoc(self):
         if (self.igra.na_potezi == CRNI and self.igra.crni == "človek") or (self.igra.na_potezi == BELI and self.igra.beli == "človek"):
             for (i, j) in self.igra.odvisne_poteze(self.igra.na_potezi):
-                pika = self.canvas.create_oval(i*50+20, j*50+20, i*50+25, j*50+25, fill="yellow")
+                pika = self.canvas.create_oval(i*50+20, j*50+20, i*50+25, j*50+25, fill="green")
                 self.pike[i][j] = pika
-                #self.canvas.create_oval(i*50+20, j*50+20, i*50+25, j*50+25, fill="yellow")
                 
     def konec_pomoci(self):
         for podseznam in self.pike:
