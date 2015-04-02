@@ -15,7 +15,7 @@ HEVRISTIKA = [[20, -3, 11, 8, 8, 11, -3, 20],
               [8, 1, 2, 1, 1, 2, 1, 8],
               [11, -4, 2, 2, 2, 2, -4, 11],
               [-3, -7, -4, 1, 1, -4, -7, -3],
-              [20, -3, 11, 8, 8, 11, -3, 20]]
+              [20, -5, 11, 8, 8, 11, -3, 20]]
 
 def drugi(igr):
     if igr == CRNI:
@@ -114,24 +114,27 @@ class Igra():
     def vrednost(self):
         """Ocena za trenutno vrednost igre. Če je igre konec, mora biti ta ocena natančna,
            sicer je to nek približek."""
-        
+
+        #Na koncu vrne natančno oceno: razliko v številu črnih in belih polj.
         if self.konec()!= None:
             if self.na_potezi == CRNI:
-                return self.stejcrne - self.stejbele 
+                return (self.stejcrne - self.stejbele) 
             else:
-                return self.stejbele - self.stejcrne
-            
+                return (self.stejbele - self.stejcrne)
+
+        #Igralec poskuša doseči, da bi imel on čim več možnih potez, nasprotnik pa čim manj.
+        #Tako ima igralec več možnosti za izbiro dobre poteze, nasprotnika pa lahko prisili v slabo potezo
         poteze_crnega = len(self.poteze(CRNI))
         poteze_belega = len(self.poteze(BELI))
         if self.poteze(CRNI) == ["pass"]:
             poteze_crnega = 0
         elif self.poteze(BELI) == ["pass"]:
-            poteze_belega = 0
-            
+            poteze_belega = 0            
+        
         if self.na_potezi == CRNI:
-            return self.vrednost_crnih - self.vrednost_belih + poteze_crnega - poteze_belega
+            return (self.vrednost_crnih - self.vrednost_belih) + (poteze_crnega - poteze_belega)
         else:
-            return self.vrednost_belih - self.vrednost_crnih + poteze_belega - poteze_crnega
+            return (self.vrednost_belih - self.vrednost_crnih) + (poteze_belega - poteze_crnega)
         
 
     def poteze(self, barva):
@@ -202,13 +205,13 @@ class Igra():
                           self.stejcrne-=1
                           self.stejbele+=1
                           self.vrednost_belih += HEVRISTIKA[i+k*di][j+k*dj]
-                          self.vrednost_crnih -= 1
+                          self.vrednost_crnih -= HEVRISTIKA[i+k*di][j+k*dj]
                       else:
                           if canvas: canvas.itemconfig(zetoni[i+k*di][j+k*dj], fill="black")
                           self.stejcrne+=1
                           self.stejbele-=1
                           self.vrednost_crnih += HEVRISTIKA[i+k*di][j+k*dj]
-                          self.vrednost_belih -= 1                          
+                          self.vrednost_belih -= HEVRISTIKA[i+k*di][j+k*dj]                          
                       k += 1
 
     def preklici(self, poteza):
@@ -234,9 +237,13 @@ class Othello:
         meni1 = Menu(menu)
         menu.add_cascade(label="Igra", menu=meni1)
         meni1.add_command(label="Črni=Človek, Beli=Človek", command=lambda: self.zacni_igro("človek", "človek"))
-        meni1.add_command(label="Črni=Človek, Beli=Računalnik", command=lambda: self.zacni_igro("človek", "računalnik"))
-        meni1.add_command(label="Črni=Računalnik, Beli=Človek", command=lambda: self.zacni_igro("računalnik", "človek"))
-        meni1.add_command(label="Črni=Računalnik, Beli=Računalnik", command=lambda: self.zacni_igro("računalnik", "računalnik"))
+        meni1.add_command(label="Črni=Človek, Beli=Računalnik - lahka", command=lambda: self.zacni_igro("človek", "računalnik", 2))
+        meni1.add_command(label="Črni=Človek, Beli=Računalnik - srednja", command=lambda: self.zacni_igro("človek", "računalnik", 3))
+        meni1.add_command(label="Črni=Človek, Beli=Računalnik - težja", command=lambda: self.zacni_igro("človek", "računalnik", 4))
+        meni1.add_command(label="Črni=Računalnik, Beli=Človek - lahka", command=lambda: self.zacni_igro("računalnik", "človek", 2))
+        meni1.add_command(label="Črni=Računalnik, Beli=Človek - srednja", command=lambda: self.zacni_igro("računalnik", "človek", 3))
+        meni1.add_command(label="Črni=Računalnik, Beli=Človek - težja", command=lambda: self.zacni_igro("računalnik", "človek", 4))
+        meni1.add_command(label="Črni=Računalnik, Beli=Računalnik", command=lambda: self.zacni_igro("računalnik", "računalnik", 3))
 
         meni2 = Menu(menu)
         menu.add_cascade(label="Navodila", menu=meni2)
@@ -273,7 +280,7 @@ class Othello:
         self.mislec_poteza = None
         self.mislec_stop = False
 
-        self.zacni_igro('človek', 'človek')
+        self.zacni_igro('človek', 'človek', None)
 
     def narisi_toplevel(self):
         """Ustvari novo okno, ki se odpre, ko v meniju izberemo možnost 'Navodila'"""
@@ -302,9 +309,11 @@ class Othello:
             self.mislec.join()
         self.canvas.master.destroy()
 
-    def zacni_igro(self, crni, beli):
+    def zacni_igro(self, crni, beli, globina):
         # Ustvari novo igro
         self.igra = Igra()
+
+        self.globina = globina
 
         self.igra.crni = crni #kdo je črni
         self.igra.beli = beli #kdo je beli
@@ -422,7 +431,7 @@ class Othello:
 
     def razmisljaj(self):
         """Za računalnikovo potezo nastavi potezo, ki jo je predlagala 'alphabeta'"""
-        self.mislec_poteza = Alphabeta(self.igra, True, globina = 4).igraj()
+        self.mislec_poteza = Alphabeta(self.igra, True, globina = self.globina).igraj()
         self.mislec = None # Pobrišemo objekt, ki predstavlja vlakno
 
     def mislec_preveri_konec(self):
