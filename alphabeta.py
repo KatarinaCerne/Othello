@@ -22,8 +22,7 @@ class Alphabeta():
     def igraj(self):
         self.pozicije = 0 # Štejemo, koliko pozicij smo pregledali
         (p, vrednost_p) = self.alphabeta(self.globina, NEG_INFINITY, POS_INFINITY, self.igralec)
-        # Izpišemo statistike
-        print ("\nAlphabeta: globina {0}, stevilo pozicij {1}, vrednost igre {2}\n".format(self.globina, self.pozicije, vrednost_p))
+        #print ("\nAlphabeta: globina {0}, stevilo pozicij {1}, vrednost igre {2}\n".format(self.globina, self.pozicije, vrednost_p))
         return p
 
     def alphabeta(self, globina, alpha, beta, igralec):
